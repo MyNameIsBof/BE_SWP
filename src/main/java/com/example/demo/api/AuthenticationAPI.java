@@ -2,6 +2,7 @@ package com.example.demo.api;
 
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.entity.User;
+import com.example.demo.model.request.RegisterRequest;
 import com.example.demo.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,8 @@ public class AuthenticationAPI {
     @Autowired
     AuthenticationService authenticationService;
     @PostMapping("/api/register")
-    public ResponseEntity register(@RequestBody User user){
-        User newAccont = authenticationService.register(user);
-        return ResponseEntity.ok(newAccont);
+    public ResponseEntity register(@RequestBody RegisterRequest request){
+        return ResponseEntity.ok( authenticationService.register(request));
     }
     @PostMapping("/api/login")
     public ResponseEntity register(@RequestBody LoginRequest loginRequest){
