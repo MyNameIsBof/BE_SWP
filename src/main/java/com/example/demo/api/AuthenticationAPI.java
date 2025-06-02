@@ -1,8 +1,8 @@
 package com.example.demo.api;
 
-import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.entity.User;
-import com.example.demo.model.request.RegisterRequest;
+import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

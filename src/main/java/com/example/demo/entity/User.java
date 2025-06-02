@@ -1,4 +1,5 @@
 package com.example.demo.entity;
+import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,10 +23,11 @@ public class User implements UserDetails {
     public String full_name;
     public String email;
     public String password;
-    public long phone;
+    public String phone;
     public String address;
     public String location;
-    public String blood_type;
+    @Enumerated(EnumType.STRING)
+    public BloodType blood_type;
     public Date last_donation;
 
     @Enumerated(EnumType.STRING)

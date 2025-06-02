@@ -1,10 +1,10 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
-import com.example.demo.model.request.RegisterRequest;
-import com.example.demo.model.response.RegisterResponse;
+import com.example.demo.dto.request.RegisterRequest;
+import com.example.demo.dto.response.RegisterResponse;
 import com.example.demo.repository.AuthenticationRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,25 +30,25 @@ public class AuthenticationService implements UserDetailsService {
     public RegisterResponse register(RegisterRequest request){
         String password = passwordEncoder.encode(request.getPassword());
         User newUser = User.builder()
-                .full_name(request.getFullName())
+                .full_name(request.getFull_name())
                 .email(request.getEmail())
                 .password(password)
-                .phone(Long.parseLong(request.getPhoneNumber()))
+                .phone(request.getPhone())
                 .address(request.getAddress())
                 .location(request.getLocation())
-                .blood_type(request.getBloodType())
-                .last_donation(request.getLastDonationDate())
+                .blood_type(request.getBlood_type())
+                .last_donation(request.getLast_donation())
                 .role(Role.MEMBER) // Assuming default role is USER
                 .build();
         RegisterResponse response = RegisterResponse.builder()
-                .fullName(newUser.getFull_name())
+                .full_name(newUser.getFull_name())
                 .email(newUser.getEmail())
-                .phoneNumber(String.valueOf(newUser.getPhone()))
+                .phone(newUser.getPhone())
                 .address(newUser.getAddress())
                 .location(newUser.getLocation())
-                .bloodType(newUser.getBlood_type())
-                .lastDonationDate(newUser.getLast_donation())
-                .role(newUser.getRole().name())
+                .blood_type(newUser.getBlood_type())
+                .last_donation(newUser.getLast_donation())
+                .role(newUser.getRole())
                 .build();
             authenticationRepository.save(newUser);
 
