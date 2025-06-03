@@ -1,6 +1,7 @@
 package com.example.demo.api;
 
 import com.example.demo.dto.request.LoginRequest;
+import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.entity.User;
 import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.service.AuthenticationService;
@@ -20,7 +21,7 @@ public class AuthenticationAPI {
     }
     @PostMapping("/api/login")
     public ResponseEntity register(@RequestBody LoginRequest loginRequest){
-        User newUser = authenticationService.login(loginRequest);
-        return ResponseEntity.ok(null);
+        LoginResponse response = authenticationService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 }
