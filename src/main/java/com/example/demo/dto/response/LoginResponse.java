@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class RegisterResponse {
+public class LoginResponse {
     public String full_name;
     public String email;
     public String password;
@@ -27,5 +27,4 @@ public class RegisterResponse {
     public Date last_donation;
     @Enumerated(EnumType.STRING)
     public Role role;
-    String token;
 }

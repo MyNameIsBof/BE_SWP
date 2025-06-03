@@ -1,15 +1,16 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.LoginRequest;
+import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.dto.response.RegisterResponse;
+import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.repository.AuthenticationRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,9 +36,9 @@ public class AuthenticationService implements UserDetailsService {
                 .password(password)
                 .phone(request.getPhone())
                 .address(request.getAddress())
-                .location(request.getLocation())
+                .location(null)
                 .blood_type(request.getBlood_type())
-                .last_donation(request.getLast_donation())
+                .last_donation(null)
                 .role(Role.MEMBER) // Assuming default role is USER
                 .build();
         RegisterResponse response = RegisterResponse.builder()
@@ -49,12 +50,13 @@ public class AuthenticationService implements UserDetailsService {
                 .blood_type(newUser.getBlood_type())
                 .last_donation(newUser.getLast_donation())
                 .role(newUser.getRole())
+                .token(null)
                 .build();
             authenticationRepository.save(newUser);
 
         return response;
     }
-    public User login(LoginRequest loginRequest){
+    public LoginResponse login(LoginRequest loginRequest){
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequest.getEmail(),
@@ -62,10 +64,21 @@ public class AuthenticationService implements UserDetailsService {
             ));
         }catch (Exception e){
             System.out.println("Thong tin dang nhap sai roi");
-            throw new AuthenticationException("Invalid username or password") {
+            throw new AuthenticationException("Sai email hoặc mật khẩu") {
             };
         }
-        return authenticationRepository.findAccountByEmail(loginRequest.getEmail());
+        User user = authenticationRepository.findAccountByEmail(loginRequest.getEmail());
+        LoginResponse response = LoginResponse.builder()
+                .address(user.getAddress())
+                .location(user.getLocation())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .full_name(user.getFull_name())
+                .email(user.getEmail())
+                .blood_type(user.getBlood_type())
+                .last_donation(user.getLast_donation())
+                .build();
+        return response ;
     }
 
     @Override
