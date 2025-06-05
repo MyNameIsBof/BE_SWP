@@ -8,12 +8,13 @@ import java.util.Date;
 
 @Data
 public class BloodInventoryRequest {
-    @NotBlank
+    @NotBlank(message = "Không được để trống")
     private String institutionId;
-    @NotBlank
+    @NotBlank(message = "Không được để trống")
     private String bloodType;
     @Min(1)
     private int unitsAvailable;
+    @NotBlank(message = "Không được để trống")
     private String address;
     private Date expirationDate;
 }
