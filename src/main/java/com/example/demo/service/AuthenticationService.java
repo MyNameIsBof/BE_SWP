@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.LoginRequest;
+import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.response.LoginResponse;
+import com.example.demo.dto.response.UpdateUserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.dto.request.RegisterRequest;
@@ -9,6 +11,7 @@ import com.example.demo.dto.response.RegisterResponse;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.repository.AuthenticationRespository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -79,6 +82,32 @@ public class AuthenticationService implements UserDetailsService {
                 .last_donation(user.getLast_donation())
                 .build();
         return response ;
+    }
+
+    public User getUserByEmail(String email){
+        User user = authenticationRepository.findAccountByEmail(email);
+        if(user == null){
+            throw new AuthenticationException(email + "not found!");
+        }
+        return user;
+    }
+
+    public UpdateUserResponse updateUserByEmail(UpdateUserRequest request){
+        User exist = getUserByEmail(request.getEmail());
+
+        if(request.getFull_name() != null || !request.getFull_name().isEmpty()){
+            exist.setFull_name(request.getFull_name());
+        }
+        if(request.getPhone() != null || !request.getPhone().isEmpty()){
+            exist.setPhone(request.getPhone());
+        }
+        if(request.getAddress() != null || !request.getAddress().isEmpty()){
+            exist.setAddress(request.getAddress());
+        }
+
+        User updateUser = authenticationRepository.save(exist);
+
+        return UpdateUserResponse.builder().success(true).message("User information updated successfully").data(updateUser).build();
     }
 
     @Override
