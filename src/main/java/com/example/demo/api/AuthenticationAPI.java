@@ -6,8 +6,10 @@ import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.dto.response.UpdateUserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.dto.request.RegisterRequest;
+import com.example.demo.repository.AuthenticationRespository;
 import com.example.demo.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class AuthenticationAPI {
     private final AuthenticationService authenticationService;
+
+    @Autowired
+    AuthenticationRespository authenticationRespository;
 
     public AuthenticationAPI(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
@@ -34,7 +39,7 @@ public class AuthenticationAPI {
     // API endpoint để lấy thông tin người dùng theo email
     @GetMapping("/find-by-email")
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
-        User user = authenticationService.getUserByEmail(email);
+        User user = authenticationRespository.findAccountByEmail(email);
         return ResponseEntity.ok(user);
     }
 

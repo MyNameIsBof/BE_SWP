@@ -84,16 +84,8 @@ public class AuthenticationService implements UserDetailsService {
         return response ;
     }
 
-    public User getUserByEmail(String email){
-        User user = authenticationRepository.findAccountByEmail(email);
-        if(user == null){
-            throw new AuthenticationException(email + "not found!");
-        }
-        return user;
-    }
-
     public UpdateUserResponse updateUserByEmail(UpdateUserRequest request){
-        User exist = getUserByEmail(request.getEmail());
+        User exist = authenticationRepository.findAccountByEmail(request.getEmail());
 
         if(request.getFull_name() != null || !request.getFull_name().isEmpty()){
             exist.setFull_name(request.getFull_name());
