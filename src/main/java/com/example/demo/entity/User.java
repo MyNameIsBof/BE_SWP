@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,19 +20,23 @@ import java.util.Date;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
-    public String full_name;
-    public String email;
-    public String password;
-    public String phone;
-    public String address;
-    public String location;
-    @Enumerated(EnumType.STRING)
-    public BloodType blood_type;
-    public Date last_donation;
+     long id;
+     String fullName;
+
+    @Column(unique = true)
+     String email;
+     String password;
+     String phone;
+     String address;
+     String location;
+
+     Date lastDonation;
 
     @Enumerated(EnumType.STRING)
-    public Role role;
+     Role role;
+
+    @Enumerated(EnumType.STRING)
+     BloodType bloodType;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -46,4 +51,6 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.email;
     }
+
+
 }

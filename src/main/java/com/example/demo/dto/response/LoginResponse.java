@@ -16,15 +16,15 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class LoginResponse {
-    public String full_name;
+    public String fullName;
     public String email;
-    public String password;
     public String phone;
     public String address;
     public String location;
     @Enumerated(EnumType.STRING)
-    public BloodType blood_type;
+    public BloodType bloodType;
     public Date last_donation;
     @Enumerated(EnumType.STRING)
     public Role role;
+    String token;
 }

@@ -14,10 +14,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class UpdateUserRequest {
-    private String full_name;
+    private String fullName;
     private String email;
     private String password;
     private String phone;
     private String address;
-    private BloodType blood_type;
+    private BloodType bloodType;
 }

@@ -6,7 +6,7 @@ import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.dto.response.UpdateUserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.dto.request.RegisterRequest;
-import com.example.demo.repository.AuthenticationRespository;
+import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.service.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class AuthenticationAPI {
     private final AuthenticationService authenticationService;
 
     @Autowired
-    AuthenticationRespository authenticationRespository;
+    AuthenticationRepository authenticationRespository;
 
     public AuthenticationAPI(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
@@ -44,9 +44,9 @@ public class AuthenticationAPI {
     }
 
     // API endpoint để cập nhật thông tin người dùng theo email
-    @PutMapping("/update-by-email")
-    public ResponseEntity<UpdateUserResponse> updateUserByEmail(@RequestBody UpdateUserRequest request) {
-        UpdateUserResponse response = authenticationService.updateUserByEmail(request);
-        return ResponseEntity.ok(response);
-    }
+//    @PutMapping("/update-by-email")
+//    public ResponseEntity<UpdateUserResponse> updateUserByEmail(@RequestBody UpdateUserRequest request) {
+//        UpdateUserResponse response = authenticationService.updateUserByEmail(request);
+//        return ResponseEntity.ok(response);
+//    }
 }
