@@ -18,9 +18,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+
     @Autowired
     Filter filter;
 
+    //autowired : tu khoi tao
     @Autowired
     AuthenticationService authenticationService;
 

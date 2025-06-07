@@ -24,24 +24,24 @@ public class BloodInventoryAPI {
         return ResponseEntity.ok(service.getAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<BloodInventoryResponse> create(@Valid @RequestBody BloodInventoryRequest request) {
-        return new ResponseEntity<>(service.create(request), HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<BloodInventoryResponse> update(@PathVariable Long id, @Valid @RequestBody BloodInventoryRequest request) {
-        return ResponseEntity.ok(service.update(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
+//        return ResponseEntity.ok(service.getById(id));
+//    }
+//
+//    @PostMapping
+//    public ResponseEntity<BloodInventoryResponse> create(@Valid @RequestBody BloodInventoryRequest request) {
+//        return new ResponseEntity<>(service.create(request), HttpStatus.CREATED);
+//    }
+//
+//    @PutMapping("/{id}")
+//    public ResponseEntity<BloodInventoryResponse> update(@PathVariable Long id, @Valid @RequestBody BloodInventoryRequest request) {
+//        return ResponseEntity.ok(service.update(id, request));
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable Long id) {
+//        service.delete(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }

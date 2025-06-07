@@ -1,20 +1,33 @@
 package com.example.demo.dto.request;
 
+import com.example.demo.entity.Blood;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class BloodInventoryRequest {
     @NotBlank(message = "Không được để trống")
-    private String institutionId;
+     String institutionId;
     @NotBlank(message = "Không được để trống")
-    private String bloodType;
+     String bloodType;
     @Min(1)
-    private int unitsAvailable;
+     double unitsAvailable;
     @NotBlank(message = "Không được để trống")
-    private String address;
-    private Date expirationDate;
+     String address;
+     Date expirationDate;
+
+     @OneToMany(mappedBy = "blood",cascade = CascadeType.ALL)
+    List<Blood> bloodList;
+
 }

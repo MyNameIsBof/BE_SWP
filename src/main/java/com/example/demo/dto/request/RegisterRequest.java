@@ -17,7 +17,7 @@ import java.util.Date;
 @Builder
 public class RegisterRequest {
      @NotBlank(message = "Không được để trống")
-     private String full_name;
+     private String fullName;
 
      @Email(message = "Email không hợp lệ")
      @NotBlank(message = "Không được để trống")
@@ -38,5 +38,5 @@ public class RegisterRequest {
      private String address;
 
      @NotNull(message = "Không được để trống")
-     private BloodType blood_type;
+     private BloodType bloodType;
 }
