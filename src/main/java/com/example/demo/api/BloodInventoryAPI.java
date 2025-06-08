@@ -2,8 +2,10 @@ package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
+import com.example.demo.entity.BloodInventory;
 import com.example.demo.service.BloodInventoryService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class BloodInventoryAPI {
     public ResponseEntity<List<BloodInventoryResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
-
+}
 //    @GetMapping("/{id}")
 //    public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
 //        return ResponseEntity.ok(service.getById(id));
@@ -44,4 +46,4 @@ public class BloodInventoryAPI {
 //        service.delete(id);
 //        return ResponseEntity.noContent().build();
 //    }
-}
+//}

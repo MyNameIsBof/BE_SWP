@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BloodInventoryRepository  extends JpaRepository<BloodInventory, Long>  {
-    @Query("SELECT new BloodInventoryResponse(b.bloodType, SUM(b.unitsAvailable)) " +
-            "FROM BloodInventory b GROUP BY b.bloodType")
+    @Query("SELECT new com.example.demo.dto.response.BloodInventoryResponse(b.bloodType, SUM(b.unitsAvailable)) FROM BloodInventory b GROUP BY b.bloodType")
     List<BloodInventoryResponse> getTotalUnitsByBloodType();
 }
