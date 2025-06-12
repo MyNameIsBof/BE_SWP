@@ -1,11 +1,10 @@
 package com.example.demo.mapper;
 
 
-import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.request.BloodRegisterRequest;
-import com.example.demo.dto.response.BloodInventoryResponse;
+
 import com.example.demo.dto.response.BloodRegisterResponse;
-import com.example.demo.entity.BloodInventory;
+
 import com.example.demo.entity.BloodRegister;
 import org.mapstruct.Mapper;
 

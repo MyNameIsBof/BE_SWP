@@ -13,5 +13,4 @@ import java.util.Date;
 public class BloodInventoryResponse {
     private BloodType bloodType;
     private Long totalUnitsAvailable;
-
 }

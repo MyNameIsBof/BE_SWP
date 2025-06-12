@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class BloodReciveResponse {
+public class BloodReceiveResponse {
     String fullName;
     String email;
     String phone;
@@ -25,8 +25,12 @@ public class BloodReciveResponse {
     LocalDate birthdate;
     double height;
     double weight;
+    LocalDate lastDonation;
+    String medicalHistory;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
+    LocalDate wantedDate;
+    LocalTime wantedHour;
     String emergencyName;
     String emergencyPhone;
 }
