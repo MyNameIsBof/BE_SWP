@@ -15,8 +15,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class UpdateUserRequest {
     private String fullName;
-    private String email;
-    private String password;
     private String phone;
     private String address;
     private BloodType bloodType;

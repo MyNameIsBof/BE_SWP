@@ -16,6 +16,7 @@ import com.example.demo.repository.BloodTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -80,25 +81,6 @@ public class AuthenticationService implements UserDetailsService {
 
         return response ;
     }
-
-//    public UpdateUserResponse updateUserByEmail(UpdateUserRequest request){
-//        User exist = authenticationRepository.findAccountByEmail(request.getEmail());
-//
-//        if(request.getFull_name() != null || !request.getFull_name().isEmpty()){
-//            exist.setFull_name(request.getFull_name());
-//        }
-//        if(request.getPhone() != null || !request.getPhone().isEmpty()){
-//            exist.setPhone(request.getPhone());
-//        }
-//        if(request.getAddress() != null || !request.getAddress().isEmpty()){
-//            exist.setAddress(request.getAddress());
-//        }
-//
-//        User updateUser = authenticationRepository.save(exist);
-//
-//        return UpdateUserResponse.builder().success(true).message("User information updated successfully").data(updateUser).build();
-//    }
-
 
 
     @Override
