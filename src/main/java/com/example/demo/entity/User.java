@@ -52,6 +52,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true )
     List<BloodRegister> registers;
 
+    @OneToMany(mappedBy = "user", orphanRemoval = true )
+    List<BloodRegister> recive;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

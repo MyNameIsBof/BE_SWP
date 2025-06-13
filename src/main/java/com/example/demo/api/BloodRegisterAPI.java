@@ -7,7 +7,6 @@ import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.service.BloodRegisterService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.Mapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

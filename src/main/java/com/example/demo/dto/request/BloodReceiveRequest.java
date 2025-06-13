@@ -1,8 +1,6 @@
 package com.example.demo.dto.request;
 
-import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.BloodType;
-import com.example.demo.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
@@ -18,8 +16,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class BloodRegisterRequest {
-    Gender gender;
+public class BloodReceiveRequest {
     LocalDate birthdate;
     double height;
     double weight;
@@ -27,12 +24,11 @@ public class BloodRegisterRequest {
     String medicalHistory;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
-
-    LocalDate wantedDate;
-
+    boolean isEmergency;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     @Schema(example = "10:30:00")
     LocalTime wantedHour;
     String emergencyName;
     String emergencyPhone;
+
 }

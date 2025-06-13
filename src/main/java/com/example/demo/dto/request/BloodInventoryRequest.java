@@ -1,10 +1,12 @@
 package com.example.demo.dto.request;
 
 import com.example.demo.entity.Blood;
+import com.example.demo.enums.BloodType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,16 +20,12 @@ import java.util.List;
 @Builder
 public class BloodInventoryRequest {
     @NotBlank(message = "Không được để trống")
-     String institutionId;
-    @NotBlank(message = "Không được để trống")
-     String bloodType;
+    String institutionId;
+    @NotNull(message = "Không được để trống")
+    BloodType bloodType;
     @Min(1)
-     double unitsAvailable;
+    double unitsAvailable;
     @NotBlank(message = "Không được để trống")
-     String address;
-     Date expirationDate;
-
-     @OneToMany(mappedBy = "blood",cascade = CascadeType.ALL)
-    List<Blood> bloodList;
-
+    String address;
+    Date expirationDate;
 }

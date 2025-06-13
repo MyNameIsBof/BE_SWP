@@ -17,26 +17,26 @@ import java.util.Date;
 @Builder
 public class RegisterRequest {
      @NotBlank(message = "Không được để trống")
-     private String fullName;
+      String fullName;
 
      @Email(message = "Email không hợp lệ")
      @NotBlank(message = "Không được để trống")
-     private String email;
+      String email;
 
      @NotBlank(message = "Không được để trống")
      @Pattern(
              regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",
              message = "Mật khẩu phải 8-20 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt"
      )
-     private String password;
+      String password;
 
      @NotBlank(message = "Không được để trống")
      @Pattern(regexp = "^(0[3|5|7|8|9][0-9]{8}|\\+84[3|5|7|8|9][0-9]{8})$", message = "Số điện thoại không hợp lệ")
-     private String phone;
+      String phone;
 
      @NotBlank(message = "Không được để trống")
-     private String address;
+      String address;
 
      @NotNull(message = "Không được để trống")
-     private BloodType bloodType;
+      BloodType bloodType;
 }
