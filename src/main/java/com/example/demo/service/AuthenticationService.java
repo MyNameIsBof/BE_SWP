@@ -1,10 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.LoginRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.response.LoginResponse;
-import com.example.demo.dto.response.UpdateUserResponse;
-import com.example.demo.entity.Blood;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.dto.request.RegisterRequest;
@@ -80,25 +77,6 @@ public class AuthenticationService implements UserDetailsService {
 
         return response ;
     }
-
-//    public UpdateUserResponse updateUserByEmail(UpdateUserRequest request){
-//        User exist = authenticationRepository.findAccountByEmail(request.getEmail());
-//
-//        if(request.getFull_name() != null || !request.getFull_name().isEmpty()){
-//            exist.setFull_name(request.getFull_name());
-//        }
-//        if(request.getPhone() != null || !request.getPhone().isEmpty()){
-//            exist.setPhone(request.getPhone());
-//        }
-//        if(request.getAddress() != null || !request.getAddress().isEmpty()){
-//            exist.setAddress(request.getAddress());
-//        }
-//
-//        User updateUser = authenticationRepository.save(exist);
-//
-//        return UpdateUserResponse.builder().success(true).message("User information updated successfully").data(updateUser).build();
-//    }
-
 
 
     @Override

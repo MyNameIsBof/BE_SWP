@@ -1,13 +1,12 @@
 package com.example.demo.api;
 
 import com.example.demo.dto.request.LoginRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.response.LoginResponse;
-import com.example.demo.dto.response.UpdateUserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin("*")
+@SecurityRequirement(name = "api")
 public class AuthenticationAPI {
+
+    @Autowired
     private final AuthenticationService authenticationService;
 
     @Autowired
@@ -43,10 +46,5 @@ public class AuthenticationAPI {
         return ResponseEntity.ok(user);
     }
 
-    // API endpoint để cập nhật thông tin người dùng theo email
-//    @PutMapping("/update-by-email")
-//    public ResponseEntity<UpdateUserResponse> updateUserByEmail(@RequestBody UpdateUserRequest request) {
-//        UpdateUserResponse response = authenticationService.updateUserByEmail(request);
-//        return ResponseEntity.ok(response);
-//    }
+    
 }
