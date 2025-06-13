@@ -41,9 +41,10 @@ public class BloodReceiveService {
         currentUser.setEmergencyName(request.getEmergencyName());
         currentUser.setEmergencyPhone(request.getEmergencyPhone());
 
+
         // Create blood receive record
         BloodReceive bloodReceive = bloodReceiveMapper.toBloodReceive(request);
-        bloodReceive.setStatus(BloodRegisterStatus.PENDING); // Using BloodRegisterStatus from entity
+        bloodReceive.setStatus(BloodReceiveStatus.PENDING); // Using BloodRegisterStatus from entity
         bloodReceive.setUser(currentUser);
         bloodReceiveRepository.save(bloodReceive);
 
@@ -55,7 +56,7 @@ public class BloodReceiveService {
         BloodReceive bloodReceive = bloodReceiveRepository.findById(id)
                 .orElseThrow(() -> new AuthenticationException("Đơn yêu cầu không tồn tại"));
 
-        if (bloodReceive.getStatus() == BloodRegisterStatus.PENDING) {
+        if (bloodReceive.getStatus() == BloodReceiveStatus.PENDING) {
             User currentUser = authenticationService.getCurrentUser();
 
             if (!bloodReceive.getUser().getEmail().equals(currentUser.getEmail())) {
@@ -93,32 +94,32 @@ public class BloodReceiveService {
                 if (currentUser.getRole() != Role.ADMIN) {
                     throw new AuthenticationException("Bạn không có quyền duyệt đơn");
                 }
-                bloodReceive.setStatus(BloodRegisterStatus.APPROVED);
+                bloodReceive.setStatus(BloodReceiveStatus.APPROVED);
                 break;
             case REJECTED:
                 if (currentUser.getRole() != Role.ADMIN) {
                     throw new AuthenticationException("Bạn không có quyền từ chối đơn");
                 }
-                bloodReceive.setStatus(BloodRegisterStatus.REJECTED);
+                bloodReceive.setStatus(BloodReceiveStatus.REJECTED);
                 break;
             case COMPLETED:
                 if (currentUser.getRole() != Role.STAFF) {
                     throw new AuthenticationException("Bạn không có quyền đánh dấu đơn hoàn thành");
                 }
-                bloodReceive.setStatus(BloodRegisterStatus.COMPLETED);
+                bloodReceive.setStatus(BloodReceiveStatus.COMPLETED);
                 break;
             case INCOMPLETED:
                 if (currentUser.getRole() != Role.STAFF) {
                     throw new AuthenticationException("Bạn không có quyền đánh dấu đơn chưa hoàn thành");
                 }
-                bloodReceive.setStatus(BloodRegisterStatus.INCOMPLETED);
+                bloodReceive.setStatus(BloodReceiveStatus.INCOMPLETED);
                 break;
             case CANCELED:
                 if (!bloodReceive.getUser().getEmail().equals(currentUser.getEmail()) &&
                         currentUser.getRole() != Role.MEMBER) {
                     throw new AuthenticationException("Bạn không có quyền hủy đơn này");
                 }
-                bloodReceive.setStatus(BloodRegisterStatus.CANCELED);
+                bloodReceive.setStatus(BloodReceiveStatus.CANCELED);
                 break;
             default:
                 throw new AuthenticationException("Trạng thái không hợp lệ");
@@ -152,6 +153,7 @@ public class BloodReceiveService {
                 .wantedHour(bloodReceive.getWantedHour())
                 .emergencyName(user.getEmergencyName())
                 .emergencyPhone(user.getEmergencyPhone())
+                .isEmergency(bloodReceive.isEmergency())
                 .build();
     }
 }

@@ -23,6 +23,7 @@ public class BloodReceiveResponse {
     String location;
     Gender gender;
     LocalDate birthdate;
+    boolean isEmergency;
     double height;
     double weight;
     LocalDate lastDonation;

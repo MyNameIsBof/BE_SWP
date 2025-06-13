@@ -7,4 +7,5 @@ public enum BloodRegisterStatus {
     COMPLETED,
     INCOMPLETED,
     CANCELED;
+
 }

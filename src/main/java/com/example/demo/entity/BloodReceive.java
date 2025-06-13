@@ -1,6 +1,6 @@
 package com.example.demo.entity;
 
-import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.BloodReceiveStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -24,13 +24,13 @@ public class BloodReceive {
     long id;
 
     @Enumerated(EnumType.STRING)
-    BloodRegisterStatus status;
+    BloodReceiveStatus status;
 
     LocalDate wantedDate;
 
     @JsonFormat(pattern = "HH:mm:ss")
     LocalTime wantedHour;
-
+    boolean isEmergency;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore

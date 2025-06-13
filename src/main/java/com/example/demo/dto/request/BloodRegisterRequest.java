@@ -5,7 +5,6 @@ import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
@@ -28,7 +27,6 @@ public class BloodRegisterRequest {
     String medicalHistory;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
-
 
     LocalDate wantedDate;
 
