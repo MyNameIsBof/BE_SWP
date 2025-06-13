@@ -1,10 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.LoginRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.response.LoginResponse;
-import com.example.demo.dto.response.UpdateUserResponse;
-import com.example.demo.entity.Blood;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.dto.request.RegisterRequest;
@@ -16,7 +13,6 @@ import com.example.demo.repository.BloodTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
