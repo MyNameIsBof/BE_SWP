@@ -6,17 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BloodInventoryResponse {
-     Long inventoryId;
-     BloodType bloodType;
-     int unitsAvailable;
-     String address;
-     Date expirationDate;
-     boolean deleted;
+public class BloodInventorySummaryResponse {
+    private BloodType bloodType;
+    private Long totalUnitsAvailable;
 }

@@ -37,6 +37,4 @@ public class BloodRegister {
             @JoinColumn(name = "user_id")
             @JsonIgnore
     User user;
-
-
 }

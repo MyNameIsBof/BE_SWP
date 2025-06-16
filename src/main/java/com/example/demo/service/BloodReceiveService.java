@@ -156,4 +156,7 @@ public class BloodReceiveService {
                 .isEmergency(bloodReceive.isEmergency())
                 .build();
     }
+    public List<BloodReceive> getByStatus(BloodReceiveStatus status) {
+        return bloodReceiveRepository.findBystatus(status);
+    }
 }

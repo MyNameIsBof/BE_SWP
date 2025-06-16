@@ -48,4 +48,9 @@ public class BloodReceiveAPI {
         bloodReceiveService.updateStatus(id, status);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/list-by-status")
+    public ResponseEntity<List<BloodReceive>> getByStatus(@PathVariable BloodReceiveStatus status) {
+        return ResponseEntity.ok(bloodReceiveService.getByStatus(status));
+    }
 }

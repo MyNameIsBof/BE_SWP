@@ -2,84 +2,177 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
+import com.example.demo.dto.response.BloodInventorySummaryResponse;
 import com.example.demo.entity.BloodInventory;
+import com.example.demo.enums.BloodType;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.BloodInventoryMapper;
 import com.example.demo.repository.BloodInventoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class BloodInventoryService {
 
-    @Autowired
-    BloodInventoryRepository bloodInventoryRepository;
+    private final BloodInventoryRepository repository;
+    private final BloodInventoryMapper mapper;
 
-    @Autowired
-    BloodInventoryMapper bloodInventoryMapper;
+    /**
+     * Get all blood inventory records with pagination
+     */
+    public Page<BloodInventoryResponse> getAllInventory(Pageable pageable) {
+        return repository.findByDeletedFalse(pageable)
+                .map(mapper::toResponse);
+    }
 
-    public List<BloodInventoryResponse> getAll() {
-        try {
-            return bloodInventoryRepository.getTotalUnitsByBloodType();
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving blood inventory list", e);
+    /**
+     * Get blood inventory by ID
+     */
+    public BloodInventoryResponse getInventoryById(Long id) {
+        BloodInventory inventory = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blood inventory with id " + id + " not found"));
+
+        if (inventory.isDeleted()) {
+            throw new ResourceNotFoundException("Blood inventory with id " + id + " has been deleted");
         }
+
+        return mapper.toResponse(inventory);
     }
 
-    public BloodInventoryResponse getById(Long id) {
-        try {
-            Optional<BloodInventory> optionalBI = bloodInventoryRepository.findById(id);
-            if (optionalBI.isEmpty()) {
-                throw new RuntimeException("Blood inventory with id " + id + " not found");
-            }
-            return toResponse(optionalBI.get());
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving blood inventory by id: " + id, e);
+    /**
+     * Create new blood inventory
+     */
+    @Transactional
+    public BloodInventoryResponse createInventory(BloodInventoryRequest request) {
+        validateExpirationDate(request.getExpirationDate());
+
+        BloodInventory inventory = mapper.toEntity(request);
+        BloodInventory saved = repository.save(inventory);
+
+        return mapper.toResponse(saved);
+    }
+
+    /**
+     * Update existing blood inventory
+     */
+    @Transactional
+    public BloodInventoryResponse updateInventory(Long id, BloodInventoryRequest request) {
+        BloodInventory inventory = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blood inventory with id " + id + " not found"));
+
+        if (inventory.isDeleted()) {
+            throw new ResourceNotFoundException("Blood inventory with id " + id + " has been deleted");
         }
-    }
 
-    public BloodInventoryResponse create(BloodInventoryRequest req) {
-        try {
-            BloodInventory saved = bloodInventoryRepository.save(toEntity(req));
-            return toResponse(saved);
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating blood inventory", e);
+        if (request.getExpirationDate() != null) {
+            validateExpirationDate(request.getExpirationDate());
         }
+
+        mapper.updateEntityFromRequest(request, inventory);
+        BloodInventory updated = repository.save(inventory);
+
+        return mapper.toResponse(updated);
     }
 
-    public BloodInventoryResponse update(Long id, BloodInventoryRequest req) {
-        try {
-            BloodInventory old = bloodInventoryRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Blood inventory with id " + id + " not found"));
-
-            // Use the mapper instead of manual field setting
-            BloodInventory updated = bloodInventoryMapper.updateBloodInventory(old, req);
-            BloodInventory saved = bloodInventoryRepository.save(updated);
-            return toResponse(saved);
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating blood inventory with id: " + id, e);
+    /**
+     * Soft delete blood inventory
+     */
+    @Transactional
+    public void deleteInventory(Long id) {
+        if (!repository.existsByInventoryIdAndDeletedFalse(id)) {
+            throw new ResourceNotFoundException("Blood inventory with id " + id + " not found or already deleted");
         }
+
+        repository.softDelete(id);
     }
 
-    public void delete(Long id) {
-        try {
-            if (!bloodInventoryRepository.existsById(id)) {
-                throw new RuntimeException("Blood inventory with id " + id + " not found");
-            }
-            bloodInventoryRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting blood inventory with id: " + id, e);
+    /**
+     * Get summary of blood inventory by blood type
+     */
+    public List<BloodInventorySummaryResponse> getInventorySummary() {
+        return repository.getTotalUnitsByBloodType();
+    }
+
+    /**
+     * Find by blood type
+     */
+    public List<BloodInventoryResponse> findByBloodType(BloodType bloodType) {
+        return repository.findByBloodTypeAndDeletedFalse(bloodType)
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find expired blood
+     */
+    public List<BloodInventoryResponse> findExpiredBlood() {
+        return repository.findExpiredBlood(new Date())
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find blood expiring soon (next 30 days)
+     */
+    public List<BloodInventoryResponse> findBloodExpiringSoon() {
+        Date today = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.DAY_OF_MONTH, 30);
+        Date thirtyDaysLater = calendar.getTime();
+
+        return repository.findByExpirationDateRange(today, thirtyDaysLater)
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find available blood by type and minimum quantity
+     */
+    public List<BloodInventoryResponse> findAvailableBloodByType(BloodType bloodType, int minUnits) {
+        return repository.findAvailableBloodByType(bloodType, minUnits)
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Restore a soft-deleted blood inventory
+     */
+    @Transactional
+    public BloodInventoryResponse restoreInventory(Long id) {
+        BloodInventory inventory = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blood inventory with id " + id + " not found"));
+
+        if (!inventory.isDeleted()) {
+            throw new IllegalStateException("Blood inventory with id " + id + " is not deleted");
         }
+
+        inventory.setDeleted(false);
+        BloodInventory restored = repository.save(inventory);
+
+        return mapper.toResponse(restored);
     }
 
-    // Helper methods for conversion between entity and DTOs
-    private BloodInventory toEntity(BloodInventoryRequest request) {
-        return bloodInventoryMapper.toBloodInventory(request);
-    }
-
-    private BloodInventoryResponse toResponse(BloodInventory entity) {
-        return bloodInventoryMapper.toBloodInventoryResponse(entity);
+    /**
+     * Helper method to validate expiration date
+     */
+    private void validateExpirationDate(Date expirationDate) {
+        Date today = new Date();
+        if (expirationDate.before(today)) {
+            throw new IllegalArgumentException("Expiration date must be in the future");
+        }
     }
 }

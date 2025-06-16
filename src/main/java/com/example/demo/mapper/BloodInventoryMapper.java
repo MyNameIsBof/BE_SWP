@@ -7,10 +7,11 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface BloodInventoryMapper {
-    BloodInventory toBloodInventory(BloodInventoryRequest request);
-    BloodInventoryResponse toBloodInventoryResponse(BloodInventory bloodInventory);
 
-    @Mapping(target = "unitsAvailable", expression = "java((int) request.getUnitsAvailable())")
+    BloodInventory toEntity(BloodInventoryRequest request);
+
+    BloodInventoryResponse toResponse(BloodInventory entity);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    BloodInventory updateBloodInventory(@MappingTarget BloodInventory entity, BloodInventoryRequest request);
+    void updateEntityFromRequest(BloodInventoryRequest request, @MappingTarget BloodInventory entity);
 }
