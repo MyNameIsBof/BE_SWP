@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,14 +22,10 @@ public class BloodInventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
      Long inventoryId;
-     String institutionId;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
-     int unitsAvailable;
-     String address;
-    @Temporal(TemporalType.DATE)
-     Date expirationDate;
+     float unitsAvailable;
+
     @OneToMany(mappedBy = "bloodInventory",cascade = CascadeType.ALL)
     List<Blood> bloods;
-
 }

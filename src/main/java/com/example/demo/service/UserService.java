@@ -1,12 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.EmailPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
+import com.example.demo.dto.response.EmailPasswordResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,6 +24,9 @@ public class UserService {
 
     @Autowired
     AuthenticationService authenticationService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
 
     public UserResponse updateUser(UserRequest userRequest){;
@@ -58,7 +64,23 @@ public class UserService {
                     .build();
 
             return userResponse;
+    }
 
+    public EmailPasswordResponse updateEmailPassword(EmailPasswordRequest emailPasswordRequest) {
+        User currentUser = authenticationService.getCurrentUser();
+        if (currentUser != null) {
+            String password = passwordEncoder.encode(emailPasswordRequest.getPassword());
+            currentUser.setEmail(emailPasswordRequest.getEmail());
+            currentUser.setPassword(password);
+            authenticationRepository.save(currentUser);
+
+            EmailPasswordResponse emailPasswordResponse = EmailPasswordResponse.builder()
+                    .email(emailPasswordRequest.getEmail())
+                    .build();
+            return emailPasswordResponse;
+        } else {
+            throw new AuthenticationException("User not found");
+        }
     }
 }
 

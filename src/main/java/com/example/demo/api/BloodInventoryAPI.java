@@ -1,6 +1,7 @@
 package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
+import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
 import com.example.demo.entity.BloodInventory;
 import com.example.demo.repository.BloodInventoryRepository;
@@ -26,10 +27,10 @@ public class BloodInventoryAPI {
     @Autowired
     BloodInventoryRepository  bloodInventoryRepository;
 
-    @GetMapping
-    public ResponseEntity<List<BloodInventoryResponse>> getAll() {
-        return ResponseEntity.ok(service.getAll());
-    }
+//    @GetMapping
+//    public ResponseEntity<List<BloodInventoryResponse>> getAll() {
+//        return ResponseEntity.ok(service.getAll());
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
@@ -39,6 +40,12 @@ public class BloodInventoryAPI {
     @PostMapping
     public ResponseEntity<BloodInventoryResponse> create(@Valid @RequestBody BloodInventoryRequest request) {
         return new ResponseEntity<>(service.create(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("generate")
+    public ResponseEntity<String> generate() {
+        service.generateDefaultBloodInventory();
+        return ResponseEntity.ok("Blood inventory generated successfully");
     }
 
     @PutMapping("/{id}")
@@ -51,4 +58,9 @@ public class BloodInventoryAPI {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+//    @PostMapping("update-quantity/{id}")
+//    public ResponseEntity<BloodInventoryResponse> updateQuantity(@PathVariable Long id, @Valid @RequestBody BloodRegisterProcessRequest request) {
+//        return ResponseEntity.ok(service.updateQuantity(id, request));
+//    }
 }

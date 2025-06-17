@@ -141,7 +141,6 @@ public class BloodReceiveService {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .address(user.getAddress())
-                .location(user.getLocation())
                 .gender(user.getGender())
                 .birthdate(user.getBirthdate())
                 .height(user.getHeight())

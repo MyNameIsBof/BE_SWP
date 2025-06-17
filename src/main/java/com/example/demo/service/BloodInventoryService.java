@@ -1,10 +1,19 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
+import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
+import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodInventory;
+import com.example.demo.entity.BloodRegister;
+import com.example.demo.entity.User;
+import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.BloodType;
+import com.example.demo.enums.Role;
+import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.mapper.BloodInventoryMapper;
 import com.example.demo.repository.BloodInventoryRepository;
+import com.example.demo.repository.BloodRegisterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +28,20 @@ public class BloodInventoryService {
 
     @Autowired
     BloodInventoryMapper bloodInventoryMapper;
+//
+//    @Autowired
+//    BloodRegisterRepository bloodRegisterRepository;
+//
+//    @Autowired
+//    AuthenticationService authenticationService;
 
-    public List<BloodInventoryResponse> getAll() {
-        try {
-            return bloodInventoryRepository.getTotalUnitsByBloodType();
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving blood inventory list", e);
-        }
-    }
+//    public List<BloodInventoryResponse> getAll() {
+//        try {
+//            return bloodInventoryRepository.getTotalUnitsByBloodType();
+//        } catch (Exception e) {
+//            throw new RuntimeException("Error retrieving blood inventory list", e);
+//        }
+//    }
 
     public BloodInventoryResponse getById(Long id) {
         try {
@@ -82,4 +97,43 @@ public class BloodInventoryService {
     private BloodInventoryResponse toResponse(BloodInventory entity) {
         return bloodInventoryMapper.toBloodInventoryResponse(entity);
     }
+
+
+//    public BloodInventoryResponse updateQuantity(Long id, BloodRegisterProcessRequest bloodRegisterProcessRequest){
+//        User currentUser = authenticationService.getCurrentUser();
+//
+//        if (!currentUser.getRole().equals(Role.STAFF)) {
+//            throw new AuthenticationException("Bạn không có quyền thực hiện thao tác này");
+//        }
+//
+//        List<BloodInventory> inventories = bloodInventoryRepository.findByBloodType(bloodRegisterProcessRequest.getBloodType());
+//        if (inventories.isEmpty()) {
+//            throw new RuntimeException("Blood type " + bloodRegisterProcessRequest.getBloodType() + " not found");
+//        }
+//
+//        BloodInventory bloodInventory = inventories.get(0);
+//        bloodInventory.setUnitsAvailable(bloodInventory.getUnitsAvailable() + bloodRegisterProcessRequest.getQuantity());
+//        bloodInventory.setDonationDate(bloodRegisterProcessRequest.getDonationDate());
+//        bloodInventoryRepository.save(bloodInventory);
+//        BloodRegister bloodRegister = bloodRegisterRepository.findById(id)
+//                .orElseThrow(() -> new AuthenticationException("Đơn đăng ký không tồn tại"));
+//        bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
+//        bloodRegisterRepository.save(bloodRegister);
+//        return toResponse(bloodInventory);
+//
+//    }
+
+    public void generateDefaultBloodInventory() {
+        for (BloodType type : BloodType.values()) {
+            boolean exists = bloodInventoryRepository.existsByBloodType(type);
+            if (!exists) {
+                BloodInventory inventory = BloodInventory.builder()
+                        .bloodType(type)
+                        .unitsAvailable(0)
+                        .build();
+                bloodInventoryRepository.save(inventory);
+            }
+        }
+    }
+
 }
