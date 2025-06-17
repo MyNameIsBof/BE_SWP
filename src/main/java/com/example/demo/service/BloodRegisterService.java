@@ -1,15 +1,19 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.request.BloodRegisterRequest;
+import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodRegisterResponse;
+import com.example.demo.entity.Blood;
+import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.mapper.BloodRegisterMapper;
 import com.example.demo.entity.BloodRegister;
-import com.example.demo.repository.AuthenticationRepository;
-import com.example.demo.repository.BloodRegisterRepository;
+import com.example.demo.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,11 @@ public class BloodRegisterService {
     @Autowired
     AuthenticationService authenticationService;
 
+    @Autowired
+    BloodInventoryRepository bloodInventoryRepository;
+
+    @Autowired
+    BloodRepository bloodRepository;
     public List<BloodRegister> getAll() {
         return bloodRegisterRepository.findAll();
     }
@@ -181,7 +190,48 @@ public class BloodRegisterService {
                 default -> throw new AuthenticationException("Trạng thái không hợp lệ");
             }
         }
+    }
 
 
+    public List<BloodRegister> getByStatuses(List<BloodRegisterStatus> statuses) {
+        return bloodRegisterRepository.findByStatusIn(statuses);
+    }
+    public BloodRegisterResponse setCompleted(BloodSetCompletedRequest bloodSetCompletedRequest) {
+        BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodRegisterId())
+                .orElseThrow(() -> new AuthenticationException("Đơn đăng ký không tồn tại"));
+//      add blood to inventory
+        BloodInventory bloodInventory = bloodInventoryRepository.findByBloodType(bloodRegister.getUser().getBloodType());
+        bloodInventory.setUnitsAvailable(bloodInventory.getUnitsAvailable() + bloodSetCompletedRequest.getUnit() );
+//        new blood
+        Blood blood = Blood.builder()
+                .bloodType(bloodRegister.getUser().getBloodType())
+                .unit(bloodSetCompletedRequest.getUnit()) // Assuming a default quantity of 1 unit
+                .expirationDate(bloodSetCompletedRequest.getImplementationDate().plusDays(50))
+                .donationDate(bloodSetCompletedRequest.getImplementationDate())
+                .bloodInventory(bloodInventory)
+                .build();
+        bloodRepository.save(blood);
+//      update status of blood register
+        bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
+        bloodRegisterRepository.save(bloodRegister);
+//       transform to response
+        BloodRegisterResponse bloodRegisterResponse = BloodRegisterResponse.builder()
+                .emergencyName(bloodRegister.getUser().getEmergencyName())
+                .emergencyPhone(bloodRegister.getUser().getEmergencyPhone())
+                .wantedDate(bloodRegister.getWantedDate())
+                .weight(bloodRegister.getUser().getWeight())
+                .height(bloodRegister.getUser().getHeight())
+                .birthdate(bloodRegister.getUser().getBirthdate())
+                .email(bloodRegister.getUser().getEmail())
+                .fullName(bloodRegister.getUser().getFullName())
+                .phone(bloodRegister.getUser().getPhone())
+                .address(bloodRegister.getUser().getAddress())
+                .gender(bloodRegister.getUser().getGender())
+                .lastDonation(bloodRegister.getUser().getLastDonation())
+                .medicalHistory(bloodRegister.getUser().getMedicalHistory())
+                .bloodType(bloodRegister.getUser().getBloodType())
+                .wantedHour(bloodRegister.getWantedHour())
+                .build();
+        return bloodRegisterResponse;
     }
 }

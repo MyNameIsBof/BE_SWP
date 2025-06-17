@@ -1,6 +1,7 @@
 package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodRegisterRequest;
+import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.enums.BloodRegisterStatus;
@@ -20,15 +21,6 @@ import java.util.List;
 public class BloodRegisterAPI {
     private final BloodRegisterService bloodRegisterService;
 
-    @GetMapping("/list-all")
-    public ResponseEntity<List<BloodRegister>> getAll() {
-        return ResponseEntity.ok(bloodRegisterService.getAll());
-    }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<BloodRegister> getById(@PathVariable Long id) {
-//        return ResponseEntity.ok(bloodRegisterService.getById(id));
-//    }
 
     @PostMapping
     public ResponseEntity<BloodRegisterResponse> create(@RequestBody BloodRegisterRequest bloodRegisterRequest) {
@@ -40,16 +32,32 @@ public class BloodRegisterAPI {
         return ResponseEntity.ok(bloodRegisterService.update(id, bloodRegisterRequest));
     }
 
+    @PutMapping("/set-complete/{id}")
+    public ResponseEntity<BloodRegisterResponse> setCompleted(@RequestBody BloodSetCompletedRequest bloodSetCompletedRequest) {
+        return ResponseEntity.ok(bloodRegisterService.setCompleted(bloodSetCompletedRequest));
+    }
+
     @PatchMapping("/update-status/{id}")
     public ResponseEntity<String> updateStatus(@PathVariable Long id, @RequestParam("status") BloodRegisterStatus status) {
         bloodRegisterService.updateStatus(id, status);
         return ResponseEntity.ok("Status updated successfully");
     }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> delete(@PathVariable Long id) {
-//        bloodRegisterService.delete(id);
-//        return ResponseEntity.noContent().build();
-//    }
+
+
+    @GetMapping("/list-by-status")
+    public ResponseEntity<List<BloodRegister>> getByStatus(@RequestParam(value = "status", required = false) List<BloodRegisterStatus> statuses) {
+        List<BloodRegister> result;
+
+        if (statuses != null && !statuses.isEmpty()) {
+            result = bloodRegisterService.getByStatuses(statuses);
+        } else {
+            result = bloodRegisterService.getAll();
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
+
 
 }
