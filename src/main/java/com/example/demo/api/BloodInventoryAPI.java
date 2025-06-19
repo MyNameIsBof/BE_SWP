@@ -27,10 +27,10 @@ public class BloodInventoryAPI {
     @Autowired
     BloodInventoryRepository  bloodInventoryRepository;
 
-//    @GetMapping
-//    public ResponseEntity<List<BloodInventoryResponse>> getAll() {
-//        return ResponseEntity.ok(service.getAll());
-//    }
+    @GetMapping
+    public ResponseEntity<List<BloodInventoryResponse>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
