@@ -3,6 +3,7 @@ package com.example.demo.dto.response;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Gender;
 import com.example.demo.enums.Role;
+import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
@@ -17,7 +18,10 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class UserResponse {
+    long id;
     String fullName;
+    String email;
+    String password;
     String phone;
     String address;
     @Enumerated(EnumType.STRING)
@@ -31,7 +35,6 @@ public class UserResponse {
     String emergencyPhone;
     @Enumerated(EnumType.STRING)
     Role role;
-
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
 }

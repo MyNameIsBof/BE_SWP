@@ -32,6 +32,7 @@ public class BloodInventoryService {
 //    @Autowired
 //    BloodRegisterRepository bloodRegisterRepository;
 
+
     public List<BloodInventoryResponse> getAll() {
         try {
             List<BloodInventory> bloodInventories = bloodInventoryRepository.findAll();
@@ -129,16 +130,21 @@ public class BloodInventoryService {
 //    }
 
     public void generateDefaultBloodInventory() {
-        for (BloodType type : BloodType.values()) {
-            boolean exists = bloodInventoryRepository.existsByBloodType(type);
-            if (!exists) {
-                BloodInventory inventory = BloodInventory.builder()
-                        .bloodType(type)
-                        .unitsAvailable(0)
-                        .build();
-                bloodInventoryRepository.save(inventory);
+        User currentUser = authenticationService.getCurrentUser();
+        if(Role.STAFF.equals(currentUser.getRole()) || Role.ADMIN.equals(currentUser.getRole())) {
+            for (BloodType type : BloodType.values()) {
+                boolean exists = bloodInventoryRepository.existsByBloodType(type);
+                if (!exists) {
+                    BloodInventory inventory = BloodInventory.builder()
+                            .bloodType(type)
+                            .unitsAvailable(0)
+                            .build();
+                    bloodInventoryRepository.save(inventory);
+                }
             }
         }
+        else {
+            throw new AuthenticationException("Bạn không có quyền thực hiện thao tác này");
+        }
     }
-
 }
