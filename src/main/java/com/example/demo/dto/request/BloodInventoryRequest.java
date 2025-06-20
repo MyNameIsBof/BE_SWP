@@ -19,13 +19,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class BloodInventoryRequest {
-    @NotBlank(message = "Không được để trống")
-    String institutionId;
     @NotNull(message = "Không được để trống")
     BloodType bloodType;
     @Min(1)
     double unitsAvailable;
     @NotBlank(message = "Không được để trống")
-    String address;
     Date expirationDate;
 }

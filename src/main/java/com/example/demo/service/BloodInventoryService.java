@@ -31,17 +31,23 @@ public class BloodInventoryService {
 //
 //    @Autowired
 //    BloodRegisterRepository bloodRegisterRepository;
-//
-    @Autowired
-    AuthenticationService authenticationService;
 
-//    public List<BloodInventoryResponse> getAll() {
-//        try {
-//            return bloodInventoryRepository.getTotalUnitsByBloodType();
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error retrieving blood inventory list", e);
-//        }
-//    }
+
+    public List<BloodInventoryResponse> getAll() {
+        try {
+            List<BloodInventory> bloodInventories = bloodInventoryRepository.findAll();
+            return bloodInventories.stream()
+                    .map(inventory -> {
+                        BloodInventoryResponse response = new BloodInventoryResponse();
+                        response.setBloodType(inventory.getBloodType());
+                        response.setUnitsAvailable((long) inventory.getUnitsAvailable());
+                        return response;
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving blood inventory list", e);
+        }
+    }
 
     public BloodInventoryResponse getById(Long id) {
         try {
