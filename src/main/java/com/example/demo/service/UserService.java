@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.EmailDetail;
 import com.example.demo.dto.request.EmailPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.EmailPasswordResponse;
@@ -27,6 +28,9 @@ public class UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    EmailService emailService;
 
 
     public UserResponse updateUser(UserRequest userRequest){;
@@ -73,6 +77,11 @@ public class UserService {
             currentUser.setEmail(emailPasswordRequest.getEmail());
             currentUser.setPassword(password);
             authenticationRepository.save(currentUser);
+
+            EmailDetail emailDetail = new EmailDetail();
+            emailDetail.setRecipient(currentUser.getEmail());
+            emailDetail.setSubject("Welcome to Blood Donation System");
+            emailService.sendMail(emailDetail);
 
             EmailPasswordResponse emailPasswordResponse = EmailPasswordResponse.builder()
                     .email(emailPasswordRequest.getEmail())

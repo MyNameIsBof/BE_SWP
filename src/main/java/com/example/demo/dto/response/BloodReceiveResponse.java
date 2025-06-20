@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class BloodReceiveResponse {
+    long id;
     String fullName;
     String email;
     String phone;
