@@ -14,9 +14,13 @@ import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.mapper.BloodInventoryMapper;
 import com.example.demo.repository.BloodInventoryRepository;
 import com.example.demo.repository.BloodRegisterRepository;
+import com.example.demo.repository.BloodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,25 +32,34 @@ public class BloodInventoryService {
 
     @Autowired
     BloodInventoryMapper bloodInventoryMapper;
-//
-//    @Autowired
-//    BloodRegisterRepository bloodRegisterRepository;
+
+    @Autowired
+    BloodRepository bloodRepository;
 
     public List<BloodInventoryResponse> getAll() {
         try {
-            List<BloodInventory> bloodInventories = bloodInventoryRepository.findAll();
-            return bloodInventories.stream()
-                    .map(inventory -> {
-                        BloodInventoryResponse response = new BloodInventoryResponse();
-                        response.setBloodType(inventory.getBloodType());
-                        response.setUnitsAvailable((long) inventory.getUnitsAvailable());
-                        return response;
-                    })
-                    .toList();
+            List<BloodInventoryResponse> responseList = new ArrayList<>();
+
+            for (BloodType type : BloodType.values()) {
+                List<BloodInventory> inventoryList = bloodInventoryRepository.findAllByBloodType(type);
+                BloodInventoryResponse response = new BloodInventoryResponse();
+                response.setBloodType(type);
+                float totalUnit = (float) inventoryList.stream()
+                        .mapToDouble(BloodInventory::getUnitsAvailable)
+                        .sum();
+
+
+                response.setUnitsAvailable(totalUnit);
+                responseList.add(response);
+            }
+
+            return responseList;
         } catch (Exception e) {
             throw new RuntimeException("Error retrieving blood inventory list", e);
         }
     }
+
+
 
     public BloodInventoryResponse getById(Long id) {
         try {
@@ -103,42 +116,22 @@ public class BloodInventoryService {
         return bloodInventoryMapper.toBloodInventoryResponse(entity);
     }
 
+    @Scheduled(cron = "0 0 0 * * *") // Chạy mỗi ngày lúc 0h00
+    public void resetExpiredBloodUnits() {
+        LocalDate today = LocalDate.now();
+//        danh sach mau hết hạn
+        List<Blood> expiredBloodList = bloodRepository.findByExpirationDateBefore(today);
 
-//    public BloodInventoryResponse updateQuantity(Long id, BloodRegisterProcessRequest bloodRegisterProcessRequest){
-//        User currentUser = authenticationService.getCurrentUser();
-//
-//        if (!currentUser.getRole().equals(Role.STAFF)) {
-//            throw new AuthenticationException("Bạn không có quyền thực hiện thao tác này");
-//        }
-//
-//        List<BloodInventory> inventories = bloodInventoryRepository.findByBloodType(bloodRegisterProcessRequest.getBloodType());
-//        if (inventories.isEmpty()) {
-//            throw new RuntimeException("Blood type " + bloodRegisterProcessRequest.getBloodType() + " not found");
-//        }
-//
-//        BloodInventory bloodInventory = inventories.get(0);
-//        bloodInventory.setUnitsAvailable(bloodInventory.getUnitsAvailable() + bloodRegisterProcessRequest.getQuantity());
-//        bloodInventory.setDonationDate(bloodRegisterProcessRequest.getDonationDate());
-//        bloodInventoryRepository.save(bloodInventory);
-//        BloodRegister bloodRegister = bloodRegisterRepository.findById(id)
-//                .orElseThrow(() -> new AuthenticationException("Đơn đăng ký không tồn tại"));
-//        bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
-//        bloodRegisterRepository.save(bloodRegister);
-//        return toResponse(bloodInventory);
-//
-//    }
-
-    public void generateDefaultBloodInventory() {
-        for (BloodType type : BloodType.values()) {
-            boolean exists = bloodInventoryRepository.existsByBloodType(type);
-            if (!exists) {
-                BloodInventory inventory = BloodInventory.builder()
-                        .bloodType(type)
-                        .unitsAvailable(0)
-                        .build();
-                bloodInventoryRepository.save(inventory);
-            }
+        for (Blood expiredBlood : expiredBloodList) {
+            BloodInventory inventory = expiredBlood.getBloodInventory();
+            inventory.setUnitsAvailable(0);
+            bloodInventoryRepository.save(inventory);
         }
+
+        bloodInventoryRepository.saveAll(
+                expiredBloodList.stream().map(Blood::getBloodInventory).distinct().toList()
+        );
     }
+
 
 }

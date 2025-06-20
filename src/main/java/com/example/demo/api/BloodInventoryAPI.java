@@ -42,11 +42,6 @@ public class BloodInventoryAPI {
         return new ResponseEntity<>(service.create(request), HttpStatus.CREATED);
     }
 
-    @PostMapping("generate")
-    public ResponseEntity<String> generate() {
-        service.generateDefaultBloodInventory();
-        return ResponseEntity.ok("Blood inventory generated successfully");
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<BloodInventoryResponse> update(@PathVariable Long id, @Valid @RequestBody BloodInventoryRequest request) {

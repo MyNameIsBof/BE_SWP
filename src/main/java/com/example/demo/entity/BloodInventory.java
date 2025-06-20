@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "Bloodinventory")
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -24,8 +23,9 @@ public class BloodInventory {
      Long inventoryId;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
-     float unitsAvailable;
+    float unitsAvailable;
 
-    @OneToMany(mappedBy = "bloodInventory",cascade = CascadeType.ALL)
-    List<Blood> bloods;
+
+    @OneToOne(mappedBy = "bloodInventory")
+    Blood bloods;
 }

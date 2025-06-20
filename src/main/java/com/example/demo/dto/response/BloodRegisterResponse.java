@@ -33,4 +33,5 @@ public class BloodRegisterResponse {
     LocalTime wantedHour;
     String emergencyName;
     String emergencyPhone;
+    float unit;
 }

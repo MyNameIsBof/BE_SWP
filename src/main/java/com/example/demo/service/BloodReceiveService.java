@@ -1,19 +1,27 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodReceiveRequest;
+import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
+import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.BloodReceive;
+import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
+import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.mapper.BloodReceiveMapper;
+import com.example.demo.repository.BloodInventoryRepository;
 import com.example.demo.repository.BloodReceiveRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,9 +30,15 @@ public class BloodReceiveService {
     private final BloodReceiveRepository bloodReceiveRepository;
     private final BloodReceiveMapper bloodReceiveMapper;
     private final AuthenticationService authenticationService;
+    private final BloodInventoryRepository bloodInventoryRepository;
+
 
     public List<BloodReceive> getAll() {
         return bloodReceiveRepository.findAll();
+    }
+
+    public List<BloodReceive> getByStatuses(List<BloodReceiveStatus> statuses) {
+        return bloodReceiveRepository.findByStatusIn(statuses);
     }
 
     @Transactional
@@ -154,5 +168,57 @@ public class BloodReceiveService {
                 .emergencyPhone(user.getEmergencyPhone())
                 .isEmergency(bloodReceive.isEmergency())
                 .build();
+    }
+
+
+
+    @Transactional
+    public BloodReceiveResponse setCompleted(BloodSetCompletedRequest request) {
+        User currentUser = authenticationService.getCurrentUser();
+        BloodType neededType = currentUser.getBloodType();
+        float requiredUnits = request.getUnit();
+
+        // Lấy danh sách nhóm máu tương thích với người nhận
+        List<BloodType> compatibleTypes = BloodType.CompatibleBloodMap.get(neededType);
+        if (compatibleTypes == null || compatibleTypes.isEmpty()) {
+            throw new GlobalException("Không có nhóm máu phù hợp để truyền cho " + neededType);
+        }
+
+        // Lấy danh sách kho máu theo nhóm tương thích, còn máu (>0 đơn vị)
+        List<BloodInventory> inventories = bloodInventoryRepository
+                .findByBloodTypeInAndUnitsAvailableGreaterThan(compatibleTypes, 0f);
+
+        // Ưu tiên loại máu gần với nhóm máu người nhận nhất
+        inventories.sort(Comparator.comparingInt(
+                inv -> compatibleTypes.indexOf(inv.getBloodType())
+        ));
+
+        float collected = 0f;
+        List<BloodInventory> usedInventories = new ArrayList<>();
+
+        for (BloodInventory inv : inventories) {
+            if (collected >= requiredUnits) break;
+
+            float available = inv.getUnitsAvailable();
+            float used = Math.min(available, requiredUnits - collected);
+
+            inv.setUnitsAvailable(available - used);
+            collected += used;
+            usedInventories.add(inv);
+        }
+
+        if (collected < requiredUnits) {
+            throw new GlobalException("Không đủ máu để truyền (đã có " + collected + " / cần " + requiredUnits + ")");
+        }
+
+        bloodInventoryRepository.saveAll(usedInventories);
+
+        // Đánh dấu đơn yêu cầu nhận máu là hoàn tất
+        BloodReceive receive = bloodReceiveRepository.findById(request.getBloodId())
+                .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
+        receive.setStatus(BloodReceiveStatus.COMPLETED);
+        bloodReceiveRepository.save(receive);
+
+        return createResponseFromUserAndReceive(currentUser, receive);
     }
 }

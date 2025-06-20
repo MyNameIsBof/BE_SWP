@@ -30,9 +30,14 @@ public class Blood {
     LocalDate expirationDate;
     LocalDate donationDate;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "bloodInventory_id")
     BloodInventory bloodInventory;
+
+
+    @OneToOne
+    @JoinColumn(name = "bloodRegister_id")
+    BloodRegister bloodRegister;
 
 
 

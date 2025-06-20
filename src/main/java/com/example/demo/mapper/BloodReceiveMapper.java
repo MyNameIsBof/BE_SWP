@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface BloodReceiveMapper {
-    // Fix: toBloodRecive → toBloodReceive
+
     BloodReceive toBloodReceive(BloodReceiveRequest request);
     BloodReceiveResponse toBloodReceiveResponse(BloodReceive bloodReceive);
 }

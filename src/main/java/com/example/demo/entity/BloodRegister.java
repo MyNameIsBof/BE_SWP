@@ -34,9 +34,12 @@ public class BloodRegister {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-            @JoinColumn(name = "user_id")
-            @JsonIgnore
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     User user;
+
+    @OneToOne(mappedBy = "bloodRegister",cascade = CascadeType.ALL)
+    Blood blood;
 
 
 }

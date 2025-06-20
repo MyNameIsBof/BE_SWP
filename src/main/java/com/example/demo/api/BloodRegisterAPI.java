@@ -27,12 +27,12 @@ public class BloodRegisterAPI {
         return ResponseEntity.ok(bloodRegisterService.create(bloodRegisterRequest));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<BloodRegisterResponse> update(@PathVariable Long id, @RequestBody BloodRegisterRequest bloodRegisterRequest) {
         return ResponseEntity.ok(bloodRegisterService.update(id, bloodRegisterRequest));
     }
 
-    @PutMapping("/set-complete/{id}")
+    @PostMapping("/set-complete")
     public ResponseEntity<BloodRegisterResponse> setCompleted(@RequestBody BloodSetCompletedRequest bloodSetCompletedRequest) {
         return ResponseEntity.ok(bloodRegisterService.setCompleted(bloodSetCompletedRequest));
     }

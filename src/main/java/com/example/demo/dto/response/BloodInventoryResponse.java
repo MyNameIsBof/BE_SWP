@@ -12,5 +12,5 @@ import java.util.Date;
 @Data
 public class BloodInventoryResponse {
      BloodType bloodType;
-     Long unitsAvailable;
+     float unitsAvailable;
 }

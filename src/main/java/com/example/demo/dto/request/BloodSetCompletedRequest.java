@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class BloodSetCompletedRequest {
-    long bloodRegisterId;
+    long bloodId;
     LocalDate implementationDate;
     float unit;
 }
