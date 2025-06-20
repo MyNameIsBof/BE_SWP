@@ -49,7 +49,7 @@ public class BloodInventoryService {
                         .sum();
 
 
-                response.setUnitsAvailable(totalUnit);
+                response.setTotalUnitsAvailable(totalUnit);
                 responseList.add(response);
             }
 
