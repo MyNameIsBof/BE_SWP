@@ -21,11 +21,10 @@ public class BloodInventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
      Long inventoryId;
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)// Chỉ định kiểu enum sẽ được lưu dưới dạng chuỗi
     BloodType bloodType;
-    float unitsAvailable;
-
-
+    @Column(name = "units_available")
+    private float unitsAvailable;
     @OneToOne(mappedBy = "bloodInventory")
     Blood bloods;
 }

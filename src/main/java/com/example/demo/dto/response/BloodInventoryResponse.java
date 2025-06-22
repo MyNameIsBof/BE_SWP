@@ -11,9 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 public class BloodInventoryResponse {
-
     long id;
-    private BloodType bloodType;
-    private float totalUnitsAvailable;
-
+    BloodType bloodType;
+    float totalUnitsAvailable;
 }

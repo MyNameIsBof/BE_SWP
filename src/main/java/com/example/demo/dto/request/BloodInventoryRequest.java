@@ -23,6 +23,6 @@ public class BloodInventoryRequest {
     BloodType bloodType;
     @Min(1)
     double unitsAvailable;
-    @NotBlank(message = "Không được để trống")
+    @NotNull(message = "Ngày hết hạn không được để trống")
     Date expirationDate;
 }

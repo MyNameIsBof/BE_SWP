@@ -7,6 +7,7 @@ import com.example.demo.entity.BloodInventory;
 import com.example.demo.repository.BloodInventoryRepository;
 import com.example.demo.service.BloodInventoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ public class BloodInventoryAPI {
     public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
+
 
     @PostMapping
     public ResponseEntity<BloodInventoryResponse> create(@Valid @RequestBody BloodInventoryRequest request) {
