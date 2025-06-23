@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.request.BloodRegisterRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
+import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodInventory;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BloodRegisterService {
@@ -196,6 +198,23 @@ public class BloodRegisterService {
         return bloodRegisterRepository.findByStatusIn(statuses);
     }
 
+    public List<BloodRegisterListResponse> getByUserId(Long userId) {
+        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);
+
+        if (bloodRegisters.isEmpty()) {
+            throw new GlobalException("Không tìm thấy đơn đăng ký nào cho người dùng này");
+        }
+
+        return bloodRegisters.stream()
+                .map(bloodRegister -> BloodRegisterListResponse.builder()
+                        .id(bloodRegister.getId())
+                        .wantedDate(bloodRegister.getWantedDate())
+                        .wantedHour(bloodRegister.getWantedHour())
+                        .status(bloodRegister.getStatus())
+                        .build()
+                ).collect(Collectors.toList());
+    }
+
     @Transactional
     public BloodRegisterResponse setCompleted(BloodSetCompletedRequest bloodSetCompletedRequest) {
         // 1. Lấy thông tin đơn đăng ký hiến máu
@@ -218,8 +237,6 @@ public class BloodRegisterService {
                 .bloodInventory(bloodInventory)
                 .build();
         bloodRepository.save(blood);
-
-
 
         // 3. Cập nhật trạng thái đơn đăng ký
         bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);

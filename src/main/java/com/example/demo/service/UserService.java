@@ -41,6 +41,7 @@ public class UserService {
             Optional.ofNullable(userRequest.getAddress()).ifPresent(currentUser::setAddress);
             Optional.ofNullable(userRequest.getGender()).ifPresent(currentUser::setGender);
             Optional.ofNullable(userRequest.getBirthdate()).ifPresent(currentUser::setBirthdate);
+            Optional.ofNullable(userRequest.getLastDonation()).ifPresent(currentUser::setLastDonation);
             Optional.ofNullable(userRequest.getHeight()).ifPresent(currentUser::setHeight);
             Optional.ofNullable(userRequest.getWeight()).ifPresent(currentUser::setWeight);
             Optional.ofNullable(userRequest.getMedicalHistory()).ifPresent(currentUser::setMedicalHistory);
