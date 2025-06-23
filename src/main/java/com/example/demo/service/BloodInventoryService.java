@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
-import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
 import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodInventory;
@@ -12,15 +11,12 @@ import com.example.demo.mapper.BloodInventoryMapper;
 import com.example.demo.repository.BloodInventoryRepository;
 import com.example.demo.repository.BloodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BloodInventoryService {
@@ -45,7 +41,7 @@ public class BloodInventoryService {
                         .mapToDouble(BloodInventory::getUnitsAvailable)
                         .sum();
 
-                response.setTotalUnitsAvailable(totalUnit);
+                response.setUnitsAvailable(totalUnit);
                 responseList.add(response);
             }
 
@@ -56,6 +52,7 @@ public class BloodInventoryService {
     }
 
     public BloodInventoryResponse getById(Long id) {
+        //lấy tất cả thông tin theo id
         try {
             BloodInventory inventory = bloodInventoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kho máu với ID: " + id));

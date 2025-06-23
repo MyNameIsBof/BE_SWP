@@ -20,11 +20,11 @@ import java.util.List;
 public class BloodInventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     Long inventoryId;
+    Long inventoryId;
     @Enumerated(EnumType.STRING)// Chỉ định kiểu enum sẽ được lưu dưới dạng chuỗi
     BloodType bloodType;
     @Column(name = "units_available")
-    private float unitsAvailable;
+    float unitsAvailable;
     @OneToOne(mappedBy = "bloodInventory")
     Blood bloods;
 }

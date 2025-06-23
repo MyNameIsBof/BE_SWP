@@ -60,6 +60,9 @@ public class BloodReceiveService {
         BloodReceive bloodReceive = bloodReceiveMapper.toBloodReceive(request);
         bloodReceive.setStatus(BloodReceiveStatus.PENDING); // Using BloodRegisterStatus from entity
         bloodReceive.setUser(currentUser);
+        bloodReceive.setEmergency(request.isEmergency());
+        bloodReceive.setWantedDate(request.getWantedDate());
+        bloodReceive.setWantedHour(request.getWantedHour());
         bloodReceiveRepository.save(bloodReceive);
 
         return createResponseFromUserAndReceive(currentUser, bloodReceive);

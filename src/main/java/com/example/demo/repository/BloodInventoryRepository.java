@@ -16,6 +16,6 @@ public interface BloodInventoryRepository  extends JpaRepository<BloodInventory,
     List<BloodInventory> findAllByBloodType(BloodType bloodType);
     List<BloodInventory> findByBloodTypeInAndUnitsAvailableGreaterThan(List<BloodType> bloodTypes, float minUnit);
     @Query("SELECT b.unitsAvailable FROM BloodInventory b WHERE b.id = :id")
-    Float findUnitsAvailableById(@Param("id") Long id);
+    Float findUnitsAvailableById(@Param("id") Long id);// Lấy số lượng máu có sẵn theo ID
 
 }
