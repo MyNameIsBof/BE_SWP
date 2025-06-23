@@ -28,16 +28,15 @@ public class BloodInventoryAPI {
     @Autowired
     BloodInventoryRepository  bloodInventoryRepository;
 
-    @GetMapping
+    @GetMapping("/get-all")
     public ResponseEntity<List<BloodInventoryResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<BloodInventoryResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
-
 
     @PostMapping
     public ResponseEntity<BloodInventoryResponse> create(@Valid @RequestBody BloodInventoryRequest request) {
@@ -45,12 +44,12 @@ public class BloodInventoryAPI {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<BloodInventoryResponse> update(@PathVariable Long id, @Valid @RequestBody BloodInventoryRequest request) {
         return ResponseEntity.ok(service.update(id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

@@ -2,6 +2,7 @@ package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodRegisterRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
+import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.enums.BloodRegisterStatus;
@@ -43,7 +44,11 @@ public class BloodRegisterAPI {
         return ResponseEntity.ok("Status updated successfully");
     }
 
-
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BloodRegisterListResponse>> getByUserId(@PathVariable Long userId) {
+        List<BloodRegisterListResponse> result = bloodRegisterService.getByUserId(userId);
+        return ResponseEntity.ok(result);
+    }
 
     @GetMapping("/list-by-status")
     public ResponseEntity<List<BloodRegister>> getByStatus(@RequestParam(value = "status", required = false) List<BloodRegisterStatus> statuses) {
