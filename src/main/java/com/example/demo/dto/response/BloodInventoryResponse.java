@@ -5,13 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BloodInventoryResponse {
     long id;
     BloodType bloodType;
-    float totalUnitsAvailable;
+    float unitsAvailable;
 }

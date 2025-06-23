@@ -25,10 +25,10 @@ public class BloodReceiveRequest {
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
     boolean isEmergency;
+    LocalDate wantedDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     @Schema(example = "10:30:00")
     LocalTime wantedHour;
     String emergencyName;
     String emergencyPhone;
-
 }

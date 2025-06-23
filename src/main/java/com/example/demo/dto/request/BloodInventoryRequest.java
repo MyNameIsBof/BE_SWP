@@ -22,7 +22,7 @@ public class BloodInventoryRequest {
     @NotNull(message = "Không được để trống")
     BloodType bloodType;
     @Min(1)
-    double unitsAvailable;
+    float unitsAvailable;
     @NotNull(message = "Ngày hết hạn không được để trống")
     Date expirationDate;
 }
