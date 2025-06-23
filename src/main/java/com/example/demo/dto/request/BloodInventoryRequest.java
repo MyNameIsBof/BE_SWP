@@ -19,10 +19,12 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class BloodInventoryRequest {
-    @NotNull(message = "Không được để trống")
-    BloodType bloodType;
-    @Min(1)
-    float unitsAvailable;
-    @NotNull(message = "Ngày hết hạn không được để trống")
-    Date expirationDate;
+    @NotNull(message = "Nhóm máu không được để trống")
+        BloodType bloodType;
+
+        @Min(value = 1, message = "Đơn vị khả dụng phải có ít nhất 1")
+        float unitsAvailable;
+
+        @NotNull(message = "Ngày hết hạn không được để trống")
+        java.time.LocalDateTime expirationDate;
 }
