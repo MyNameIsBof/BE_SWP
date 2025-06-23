@@ -1,13 +1,10 @@
 package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
-import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
-import com.example.demo.entity.BloodInventory;
 import com.example.demo.repository.BloodInventoryRepository;
 import com.example.demo.service.BloodInventoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +17,8 @@ import java.util.List;
 @RequestMapping("/api/blood-inventory")
 @SecurityRequirement(name = "api")
 public class BloodInventoryAPI {
-    public BloodInventoryAPI(BloodInventoryService service) {
-        this.service = service;
-    }
-    private final BloodInventoryService service;
+    @Autowired
+    BloodInventoryService service;
 
     @Autowired
     BloodInventoryRepository  bloodInventoryRepository;
