@@ -23,12 +23,12 @@ public class BloodRegisterAPI {
     private final BloodRegisterService bloodRegisterService;
 
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<BloodRegisterResponse> create(@RequestBody BloodRegisterRequest bloodRegisterRequest) {
         return ResponseEntity.ok(bloodRegisterService.create(bloodRegisterRequest));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<BloodRegisterResponse> update(@PathVariable Long id, @RequestBody BloodRegisterRequest bloodRegisterRequest) {
         return ResponseEntity.ok(bloodRegisterService.update(id, bloodRegisterRequest));
     }

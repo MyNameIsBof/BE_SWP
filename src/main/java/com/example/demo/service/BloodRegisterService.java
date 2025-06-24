@@ -45,7 +45,10 @@ public class BloodRegisterService {
 
     public List<BloodRegisterListResponse> getAll() {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
-
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu");
+        }
         return bloodRegisters.stream()
                 .map(bloodRegister -> BloodRegisterListResponse.builder()
                         .id(bloodRegister.getId())
@@ -174,13 +177,6 @@ public class BloodRegisterService {
                     bloodRegister.setStatus(BloodRegisterStatus.REJECTED);
                     bloodRegisterRepository.save(bloodRegister);
                 }
-                case COMPLETED -> {
-                    if (authenticationService.getCurrentUser().getRole() != Role.STAFF) {
-                        throw new GlobalException("Bạn không có quyền đánh dấu đơn đăng ký đã hoàn thành");
-                    }
-                    bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
-                    bloodRegisterRepository.save(bloodRegister);
-                }
                 case INCOMPLETED -> {
                     if (authenticationService.getCurrentUser().getRole() != Role.STAFF) {
                         throw new GlobalException("Bạn không có quyền đánh dấu đơn đăng ký chưa hoàn thành");
@@ -217,6 +213,10 @@ public class BloodRegisterService {
    }
 
     public List<BloodRegisterListResponse> getByUserId(Long userId) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu của người dùng");
+        }
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);
 
         if (bloodRegisters.isEmpty()) {
@@ -235,6 +235,10 @@ public class BloodRegisterService {
 
     @Transactional
     public BloodRegisterResponse setCompleted(BloodSetCompletedRequest bloodSetCompletedRequest) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền thêm máu vào kho máu");
+        }
         // 1. Lấy thông tin đơn đăng ký hiến máu
         BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodId())
                 .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));

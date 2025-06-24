@@ -36,6 +36,10 @@ public class BloodReceiveService {
 
     public List<BloodReciveListResponse> getAll() {
         List<BloodReceive> bloodReceives = bloodReceiveRepository.findAll();
+        User currentUser = authenticationService.getCurrentUser();
+          if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký nhận máu");
+        }
         return bloodReceives.stream()
                 .map(bloodReceive -> BloodReciveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
                         .id(bloodReceive.getId())
@@ -51,6 +55,10 @@ public class BloodReceiveService {
 
 public List<BloodReciveListResponse> getByStatuses(List<BloodReceiveStatus> statuses) {
     List<BloodReceive> bloodReceives = bloodReceiveRepository.findByStatusIn(statuses);
+    User currentUser = authenticationService.getCurrentUser();
+         if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký nhận máu");
+        }
     return bloodReceives.stream()
             .map(bloodReceive -> BloodReciveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
                     .id(bloodReceive.getId())
@@ -168,6 +176,10 @@ public List<BloodReciveListResponse> getByStatuses(List<BloodReceiveStatus> stat
     }
 
     public BloodReceiveResponse getById(Long id) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền xem thông tin đơn yêu cầu này");
+        }
         BloodReceive bloodReceive = bloodReceiveRepository.findById(id)
                 .orElseThrow(() -> new AuthenticationException("Đơn yêu cầu không tồn tại"));
 
@@ -200,6 +212,9 @@ public List<BloodReciveListResponse> getByStatuses(List<BloodReceiveStatus> stat
     @Transactional
     public BloodReceiveResponse setCompleted(BloodSetCompletedRequest request) {
         User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền lấy máu cho người nhận");
+        }
         BloodType neededType = currentUser.getBloodType();
         float requiredUnits = request.getUnit();
 

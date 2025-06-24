@@ -6,6 +6,7 @@ import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.EmailPasswordResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
+import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
@@ -13,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -73,6 +76,9 @@ public class UserService {
 
     public EmailPasswordResponse updateEmailPassword(EmailPasswordRequest emailPasswordRequest) {
         User currentUser = authenticationService.getCurrentUser();
+        if (!emailPasswordRequest.getEmail().equals(currentUser.getEmail())) {
+            throw new AuthenticationException("Bạn không có quyền cập nhật email này");
+        }
         if (currentUser != null) {
             String password = passwordEncoder.encode(emailPasswordRequest.getPassword());
             currentUser.setEmail(emailPasswordRequest.getEmail());
@@ -91,6 +97,33 @@ public class UserService {
         } else {
             throw new AuthenticationException("User not found");
         }
+    }
+
+    public List<UserResponse> getUsersExceptAdmin() {
+        User currentUser = authenticationService.getCurrentUser();
+        if (currentUser == null || !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new AuthenticationException("Bạn không có quyền truy cập vào danh sách người dùng");
+        }
+       List<User> users = authenticationRepository.findByRoleNot(Role.ADMIN);
+
+        return users.stream().map(user -> UserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .gender(user.getGender())
+                .birthdate(user.getBirthdate())
+                .height(user.getHeight())
+                .weight(user.getWeight())
+                .lastDonation(user.getLastDonation())
+                .medicalHistory(user.getMedicalHistory())
+                .emergencyName(user.getEmergencyName())
+                .emergencyPhone(user.getEmergencyPhone())
+                .role(user.getRole())
+                .bloodType(user.getBloodType())
+                .build()).toList();
     }
 }
 

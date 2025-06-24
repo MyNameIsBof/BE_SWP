@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class BloodInventoryResponse {
-    long id;
     BloodType bloodType;
     float unitsAvailable;
 }

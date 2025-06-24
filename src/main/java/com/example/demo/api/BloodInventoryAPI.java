@@ -33,7 +33,7 @@ public class BloodInventoryAPI {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<BloodInventoryResponse> create(@Valid @RequestBody BloodInventoryRequest request) {
         return new ResponseEntity<>(service.create(request), HttpStatus.CREATED);
     }
