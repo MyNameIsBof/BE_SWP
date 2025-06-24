@@ -51,8 +51,8 @@ public class BloodRegisterAPI {
     }
 
     @GetMapping("/list-by-status")
-    public ResponseEntity<List<BloodRegister>> getByStatus(@RequestParam(value = "status", required = false) List<BloodRegisterStatus> statuses) {
-        List<BloodRegister> result;
+    public ResponseEntity<List<BloodRegisterListResponse>> getByStatus(@RequestParam(value = "status", required = false) List<BloodRegisterStatus> statuses) {
+        List<BloodRegisterListResponse> result;
 
         if (statuses != null && !statuses.isEmpty()) {
             result = bloodRegisterService.getByStatuses(statuses);

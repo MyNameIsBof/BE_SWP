@@ -1,7 +1,11 @@
 package com.example.demo.dto.response;
 
-import com.example.demo.enums.BloodRegisterStatus;
+
+import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.enums.BloodType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,10 +17,13 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class BloodRegisterListResponse {
+public class BloodReciveListResponse {
     long id;
+    @Enumerated(EnumType.STRING)
+    BloodReceiveStatus status;
     LocalDate wantedDate;
+    @JsonFormat(pattern = "HH:mm:ss")
     LocalTime wantedHour;
-    BloodRegisterStatus status;
     BloodType bloodType;
+    boolean isEmergency;
 }
