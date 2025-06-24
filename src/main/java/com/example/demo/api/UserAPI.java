@@ -12,21 +12,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/update-user")
+@RequestMapping("/api/user")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 @RequiredArgsConstructor
 public class UserAPI {
 
     private final UserService updateUserService;
-    @PutMapping()
+    @PutMapping("update-user")
     public ResponseEntity<UserResponse> update(@RequestBody UserRequest userRequest) {
         return ResponseEntity.ok(updateUserService.updateUser(userRequest));
     }
 
-    @PutMapping("/email-password")
+    @PutMapping("/update/email-password")
     public ResponseEntity<EmailPasswordResponse> updateEmailPassword(@RequestBody EmailPasswordRequest emailPasswordRequest) {
         return ResponseEntity.ok(updateUserService.updateEmailPassword(emailPasswordRequest));
+    }
+
+    @GetMapping("get-user-by-role")
+    public ResponseEntity<?> getListUserByRole() {
+        return ResponseEntity.ok(updateUserService.getUsersExceptAdmin());
     }
 
 }

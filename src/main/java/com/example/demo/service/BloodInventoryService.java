@@ -4,7 +4,9 @@ import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
 import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodInventory;
+import com.example.demo.entity.User;
 import com.example.demo.enums.BloodType;
+import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.exception.exceptions.ResourceNotFoundException;
 import com.example.demo.mapper.BloodInventoryMapper;
@@ -29,7 +31,14 @@ public class BloodInventoryService {
     @Autowired
     BloodRepository bloodRepository;
 
+    @Autowired
+    AuthenticationService authenticationService;
+
     public List<BloodInventoryResponse> getAll() {
+        User currentUser = authenticationService.getCurrentUser();
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách kho máu");
+        }
         try {
             List<BloodInventoryResponse> responseList = new ArrayList<>();
 
@@ -52,6 +61,10 @@ public class BloodInventoryService {
     }
 
     public BloodInventoryResponse getById(Long id) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất kho máu");
+        }
         //lấy tất cả thông tin theo id
         try {
             BloodInventory inventory = bloodInventoryRepository.findById(id)
@@ -66,6 +79,10 @@ public class BloodInventoryService {
     }
 
     public BloodInventoryResponse create(BloodInventoryRequest req) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền tạo kho máu");
+        }
         try {
             BloodInventory saved = bloodInventoryRepository.save(toEntity(req));
             return toResponse(saved);
@@ -76,6 +93,10 @@ public class BloodInventoryService {
     }
 
     public BloodInventoryResponse update(Long id, BloodInventoryRequest req) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền cập nhật kho máu");
+        }
         try {
             BloodInventory old = bloodInventoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kho máu với ID: " + id));
@@ -93,6 +114,10 @@ public class BloodInventoryService {
     }
 
     public void delete(Long id) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền xóa kho máu");
+        }
         try {
             if (!bloodInventoryRepository.existsById(id)) {
                 // Use ResourceNotFoundException consistently

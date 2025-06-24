@@ -40,18 +40,18 @@ public class BloodReceiveAPI {
     }
 
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<BloodReceiveResponse> create(@RequestBody BloodReceiveRequest request) {
         return ResponseEntity.ok(bloodReceiveService.create(request));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<BloodReceiveResponse> update(@PathVariable Long id,
                                                        @RequestBody BloodReceiveRequest request) {
         return ResponseEntity.ok(bloodReceiveService.update(id, request));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<BloodReceiveResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(bloodReceiveService.getById(id));
     }
