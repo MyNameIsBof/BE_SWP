@@ -43,8 +43,17 @@ public class BloodRegisterService {
     @Autowired
     BloodRepository bloodRepository;
 
-    public List<BloodRegister> getAll() {
-        return bloodRegisterRepository.findAll();
+    public List<BloodRegisterListResponse> getAll() {
+        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
+
+        return bloodRegisters.stream()
+                .map(bloodRegister -> BloodRegisterListResponse.builder()
+                        .id(bloodRegister.getId())
+                        .wantedDate(bloodRegister.getWantedDate())
+                        .wantedHour(bloodRegister.getWantedHour())
+                        .status(bloodRegister.getStatus())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public BloodRegisterResponse create(BloodRegisterRequest bloodRegisterRequest) {
@@ -194,9 +203,18 @@ public class BloodRegisterService {
     }
 
 
-    public List<BloodRegister> getByStatuses(List<BloodRegisterStatus> statuses) {
-        return bloodRegisterRepository.findByStatusIn(statuses);
-    }
+   public List<BloodRegisterListResponse> getByStatuses(List<BloodRegisterStatus> statuses) {
+       List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByStatusIn(statuses);
+
+       return bloodRegisters.stream()
+               .map(bloodRegister -> BloodRegisterListResponse.builder()
+                       .id(bloodRegister.getId())
+                       .wantedDate(bloodRegister.getWantedDate())
+                       .wantedHour(bloodRegister.getWantedHour())
+                       .status(bloodRegister.getStatus())
+                       .build())
+               .collect(Collectors.toList());
+   }
 
     public List<BloodRegisterListResponse> getByUserId(Long userId) {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);

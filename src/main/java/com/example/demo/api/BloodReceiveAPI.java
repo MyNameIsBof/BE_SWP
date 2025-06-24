@@ -3,6 +3,7 @@ package com.example.demo.api;
 import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
+import com.example.demo.dto.response.BloodReciveListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.entity.BloodReceive;
 import com.example.demo.entity.BloodRegister;
@@ -26,8 +27,8 @@ public class BloodReceiveAPI {
     private final BloodReceiveService bloodReceiveService;
 
     @GetMapping("/list-by-status")
-    public ResponseEntity<List<BloodReceive>> getByStatus(@RequestParam(value = "status", required = false) List<BloodReceiveStatus> statuses) {
-        List<BloodReceive> result;
+    public ResponseEntity<List<BloodReciveListResponse>> getByStatus(@RequestParam(value = "status", required = false) List<BloodReceiveStatus> statuses) {
+        List<BloodReciveListResponse> result;
 
         if (statuses != null && !statuses.isEmpty()) {
             result = bloodReceiveService.getByStatuses(statuses);

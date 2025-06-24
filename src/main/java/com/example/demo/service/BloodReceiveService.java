@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
+import com.example.demo.dto.response.BloodReciveListResponse;
 import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.BloodReceive;
 import com.example.demo.entity.BloodRegister;
@@ -33,13 +34,34 @@ public class BloodReceiveService {
     private final BloodInventoryRepository bloodInventoryRepository;
 
 
-    public List<BloodReceive> getAll() {
-        return bloodReceiveRepository.findAll();
+    public List<BloodReciveListResponse> getAll() {
+        List<BloodReceive> bloodReceives = bloodReceiveRepository.findAll();
+        return bloodReceives.stream()
+                .map(bloodReceive -> BloodReciveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
+                        .id(bloodReceive.getId())
+                        .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
+                        .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
+                        .wantedHour(bloodReceive.getWantedHour())  // Giờ mong muốn
+                        .bloodType(bloodReceive.getUser().getBloodType())  // Loại nhóm máu
+                        .isEmergency(bloodReceive.isEmergency())  // Kiểm tra tình trạng khẩn cấp
+                        .build())
+                .toList();
     }
 
-    public List<BloodReceive> getByStatuses(List<BloodReceiveStatus> statuses) {
-        return bloodReceiveRepository.findByStatusIn(statuses);
-    }
+
+public List<BloodReciveListResponse> getByStatuses(List<BloodReceiveStatus> statuses) {
+    List<BloodReceive> bloodReceives = bloodReceiveRepository.findByStatusIn(statuses);
+    return bloodReceives.stream()
+            .map(bloodReceive -> BloodReciveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
+                    .id(bloodReceive.getId())
+                    .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
+                    .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
+                    .wantedHour(bloodReceive.getWantedHour())  // Giờ mong muốn
+                    .bloodType(bloodReceive.getUser().getBloodType())  // Loại nhóm máu
+                    .isEmergency(bloodReceive.isEmergency())  // Kiểm tra tình trạng khẩn cấp
+                    .build())
+            .toList();
+}
 
     @Transactional
     public BloodReceiveResponse create(BloodReceiveRequest request) {
