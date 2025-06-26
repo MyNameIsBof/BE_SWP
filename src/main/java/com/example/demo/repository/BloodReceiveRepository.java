@@ -12,4 +12,5 @@ import java.util.List;
 @Repository
 public interface BloodReceiveRepository extends JpaRepository<BloodReceive, Long> {
     List<BloodReceive> findByStatusIn(List<BloodReceiveStatus> statuses);
+    List<BloodReceive> findByUserId(Long userId);
 }

@@ -3,12 +3,8 @@ package com.example.demo.api;
 import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
-import com.example.demo.dto.response.BloodReciveListResponse;
-import com.example.demo.dto.response.BloodRegisterResponse;
-import com.example.demo.entity.BloodReceive;
-import com.example.demo.entity.BloodRegister;
+import com.example.demo.dto.response.BloodReceiveListResponse;
 import com.example.demo.enums.BloodReceiveStatus;
-import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.service.BloodReceiveService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +23,8 @@ public class BloodReceiveAPI {
     private final BloodReceiveService bloodReceiveService;
 
     @GetMapping("/list-by-status")
-    public ResponseEntity<List<BloodReciveListResponse>> getByStatus(@RequestParam(value = "status", required = false) List<BloodReceiveStatus> statuses) {
-        List<BloodReciveListResponse> result;
+    public ResponseEntity<List<BloodReceiveListResponse>> getByStatus(@RequestParam(value = "status", required = false) List<BloodReceiveStatus> statuses) {
+        List<BloodReceiveListResponse> result;
 
         if (statuses != null && !statuses.isEmpty()) {
             result = bloodReceiveService.getByStatuses(statuses);
@@ -66,5 +62,11 @@ public class BloodReceiveAPI {
     @PostMapping("/set-complete")
     public ResponseEntity<BloodReceiveResponse> setCompleted(@RequestBody BloodSetCompletedRequest bloodSetCompletedRequest) {
         return ResponseEntity.ok(bloodReceiveService.setCompleted(bloodSetCompletedRequest));
+    }
+
+    @GetMapping("/get-blood-receive-by-user-id")
+    public ResponseEntity<List<BloodReceiveListResponse>> getBloodReceiveByUserId(@RequestParam Long userId) {
+        List<BloodReceiveListResponse> result = bloodReceiveService.getByUserId(userId);
+        return ResponseEntity.ok(result);
     }
 }

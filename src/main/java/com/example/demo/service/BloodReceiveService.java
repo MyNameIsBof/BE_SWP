@@ -3,13 +3,13 @@ package com.example.demo.service;
 import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
-import com.example.demo.dto.response.BloodReciveListResponse;
+import com.example.demo.dto.response.BloodReceiveListResponse;
+import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.BloodReceive;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodReceiveStatus;
-import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,14 +35,14 @@ public class BloodReceiveService {
     private final BloodInventoryRepository bloodInventoryRepository;
 
 
-    public List<BloodReciveListResponse> getAll() {
+    public List<BloodReceiveListResponse> getAll() {
         List<BloodReceive> bloodReceives = bloodReceiveRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
           if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký nhận máu");
         }
         return bloodReceives.stream()
-                .map(bloodReceive -> BloodReciveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
+                .map(bloodReceive -> BloodReceiveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
                         .id(bloodReceive.getId())
                         .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
                         .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
@@ -53,14 +54,14 @@ public class BloodReceiveService {
     }
 
 
-public List<BloodReciveListResponse> getByStatuses(List<BloodReceiveStatus> statuses) {
+public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> statuses) {
     List<BloodReceive> bloodReceives = bloodReceiveRepository.findByStatusIn(statuses);
     User currentUser = authenticationService.getCurrentUser();
          if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký nhận máu");
         }
     return bloodReceives.stream()
-            .map(bloodReceive -> BloodReciveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
+            .map(bloodReceive -> BloodReceiveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
                     .id(bloodReceive.getId())
                     .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
                     .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
@@ -260,5 +261,29 @@ public List<BloodReciveListResponse> getByStatuses(List<BloodReceiveStatus> stat
         bloodReceiveRepository.save(receive);
 
         return createResponseFromUserAndReceive(currentUser, receive);
+    }
+
+    public List<BloodReceiveListResponse> getByUserId(Long userId) {
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu của người dùng");
+        }
+        List<BloodReceive> bloodReceives = bloodReceiveRepository.findByUserId(userId);
+
+        if (bloodReceives.isEmpty()) {
+            throw new GlobalException("Không tìm thấy đơn nhận máu nào cho người dùng này");
+        }
+
+        return bloodReceives.stream()
+                .map(bloodReceive -> BloodReceiveListResponse.builder()
+                        .id(bloodReceive.getId())
+                        .status(bloodReceive.getStatus())
+                        .wantedDate(bloodReceive.getWantedDate())
+                        .wantedHour(bloodReceive.getWantedHour())
+                        .status(bloodReceive.getStatus())
+                        .bloodType(bloodReceive.getUser().getBloodType())
+                        .isEmergency(bloodReceive.isEmergency())
+                        .build()
+                ).collect(Collectors.toList());
     }
 }

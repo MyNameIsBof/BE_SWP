@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class BloodReciveListResponse {
+public class BloodReceiveListResponse {
     long id;
     @Enumerated(EnumType.STRING)
     BloodReceiveStatus status;
