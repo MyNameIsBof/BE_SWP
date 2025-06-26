@@ -24,7 +24,7 @@ public class EmailService {
 
             Context context = new Context();
 
-            context.setVariable("name", "Huu Vinh");
+            context.setVariable("name", "Blood Donation Support system");
 
             String html = templateEngine.process("emailtemplate", context);
 

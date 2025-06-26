@@ -55,6 +55,7 @@ public class BloodRegisterService {
                         .wantedDate(bloodRegister.getWantedDate())
                         .wantedHour(bloodRegister.getWantedHour())
                         .status(bloodRegister.getStatus())
+                        .bloodType(bloodRegister.getUser().getBloodType())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -208,15 +209,12 @@ public class BloodRegisterService {
                        .wantedDate(bloodRegister.getWantedDate())
                        .wantedHour(bloodRegister.getWantedHour())
                        .status(bloodRegister.getStatus())
+                       .bloodType(bloodRegister.getUser().getBloodType())
                        .build())
                .collect(Collectors.toList());
    }
 
     public List<BloodRegisterListResponse> getByUserId(Long userId) {
-        User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu của người dùng");
-        }
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);
 
         if (bloodRegisters.isEmpty()) {
