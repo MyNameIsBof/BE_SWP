@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -222,64 +223,80 @@ public class BloodRegisterService {
         }
 
         return bloodRegisters.stream()
-                .map(bloodRegister -> BloodRegisterListResponse.builder()
-                        .id(bloodRegister.getId())
-                        .wantedDate(bloodRegister.getWantedDate())
-                        .wantedHour(bloodRegister.getWantedHour())
-                        .status(bloodRegister.getStatus())
-                        .build()
-                ).collect(Collectors.toList());
+                .map(bloodRegister -> {
+                    float unit = 0;
+                    if (bloodRegister.getStatus() == BloodRegisterStatus.COMPLETED) {
+                        Optional<Blood> blood = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
+                        if (blood.isPresent()) {
+                            unit = blood.get().getUnit();
+                        }
+                    }
+
+                    return BloodRegisterListResponse.builder()
+                            .id(bloodRegister.getId())
+                            .wantedDate(bloodRegister.getWantedDate())
+                            .wantedHour(bloodRegister.getWantedHour())
+                            .status(bloodRegister.getStatus())
+                            .bloodType(bloodRegister.getUser().getBloodType())
+                            .unit(unit)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public BloodRegisterResponse setCompleted(BloodSetCompletedRequest bloodSetCompletedRequest) {
-        User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền thêm máu vào kho máu");
+        try{
+            User currentUser = authenticationService.getCurrentUser();
+            if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new GlobalException("Bạn không có quyền thêm máu vào kho máu");
+            }
+            // 1. Lấy thông tin đơn đăng ký hiến máu
+            BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodId())
+                    .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
+
+            //        2. bo vo kho mau
+            BloodInventory bloodInventory = new BloodInventory();
+            bloodInventory.setBloodType(bloodRegister.getUser().getBloodType());
+            bloodInventory.setUnitsAvailable(bloodSetCompletedRequest.getUnit());
+            bloodInventoryRepository.save(bloodInventory);
+
+            // 2. Tạo bản ghi máu mới
+            Blood blood = Blood.builder()
+                    .bloodType(bloodRegister.getUser().getBloodType())
+                    .unit(bloodSetCompletedRequest.getUnit())
+                    .expirationDate(bloodSetCompletedRequest.getImplementationDate().plusDays(50))
+                    .donationDate(bloodSetCompletedRequest.getImplementationDate())
+                    .bloodRegister(bloodRegister)
+                    .bloodInventory(bloodInventory)
+                    .build();
+            bloodRepository.save(blood);
+
+            // 3. Cập nhật trạng thái đơn đăng ký
+            bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
+            bloodRegisterRepository.save(bloodRegister);
+
+            // 5. Chuyển sang response trả về
+            return BloodRegisterResponse.builder()
+                    .emergencyName(bloodRegister.getUser().getEmergencyName())
+                    .emergencyPhone(bloodRegister.getUser().getEmergencyPhone())
+                    .wantedDate(bloodRegister.getWantedDate())
+                    .weight(bloodRegister.getUser().getWeight())
+                    .height(bloodRegister.getUser().getHeight())
+                    .birthdate(bloodRegister.getUser().getBirthdate())
+                    .email(bloodRegister.getUser().getEmail())
+                    .fullName(bloodRegister.getUser().getFullName())
+                    .phone(bloodRegister.getUser().getPhone())
+                    .address(bloodRegister.getUser().getAddress())
+                    .gender(bloodRegister.getUser().getGender())
+                    .lastDonation(bloodRegister.getUser().getLastDonation())
+                    .medicalHistory(bloodRegister.getUser().getMedicalHistory())
+                    .bloodType(bloodRegister.getUser().getBloodType())
+                    .wantedHour(bloodRegister.getWantedHour())
+                    .unit(bloodSetCompletedRequest.getUnit())
+                    .build();
+        } catch (Exception e){
+            throw new GlobalException("Đơn đã hoàn thành hoặc không tồn tại");
         }
-        // 1. Lấy thông tin đơn đăng ký hiến máu
-        BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodId())
-                .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
-
-        //        2. bo vo kho mau
-        BloodInventory bloodInventory = new BloodInventory();
-        bloodInventory.setBloodType(bloodRegister.getUser().getBloodType());
-        bloodInventory.setUnitsAvailable(bloodSetCompletedRequest.getUnit());
-        bloodInventoryRepository.save(bloodInventory);
-
-        // 2. Tạo bản ghi máu mới
-        Blood blood = Blood.builder()
-                .bloodType(bloodRegister.getUser().getBloodType())
-                .unit(bloodSetCompletedRequest.getUnit())
-                .expirationDate(bloodSetCompletedRequest.getImplementationDate().plusDays(50))
-                .donationDate(bloodSetCompletedRequest.getImplementationDate())
-                .bloodRegister(bloodRegister)
-                .bloodInventory(bloodInventory)
-                .build();
-        bloodRepository.save(blood);
-
-        // 3. Cập nhật trạng thái đơn đăng ký
-        bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
-        bloodRegisterRepository.save(bloodRegister);
-
-        // 5. Chuyển sang response trả về
-        return BloodRegisterResponse.builder()
-                .emergencyName(bloodRegister.getUser().getEmergencyName())
-                .emergencyPhone(bloodRegister.getUser().getEmergencyPhone())
-                .wantedDate(bloodRegister.getWantedDate())
-                .weight(bloodRegister.getUser().getWeight())
-                .height(bloodRegister.getUser().getHeight())
-                .birthdate(bloodRegister.getUser().getBirthdate())
-                .email(bloodRegister.getUser().getEmail())
-                .fullName(bloodRegister.getUser().getFullName())
-                .phone(bloodRegister.getUser().getPhone())
-                .address(bloodRegister.getUser().getAddress())
-                .gender(bloodRegister.getUser().getGender())
-                .lastDonation(bloodRegister.getUser().getLastDonation())
-                .medicalHistory(bloodRegister.getUser().getMedicalHistory())
-                .bloodType(bloodRegister.getUser().getBloodType())
-                .wantedHour(bloodRegister.getWantedHour())
-                .unit(bloodSetCompletedRequest.getUnit())
-                .build();
     }
 }

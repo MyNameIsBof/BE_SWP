@@ -65,7 +65,7 @@ public class BloodRegisterRequest {
     String emergencyName;
 
     @NotEmpty(message = "Số điện thoại liên hệ khẩn cấp là bắt buộc")
-    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Định dạng số điện thoại không hợp lệ")
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Số điện thoại không hợp lệ")
     @Schema(example = "+84123456789", description = "Số điện thoại liên hệ khẩn cấp")
     String emergencyPhone;
 }

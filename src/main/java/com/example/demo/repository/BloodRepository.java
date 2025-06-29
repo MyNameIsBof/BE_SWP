@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface BloodRepository extends JpaRepository<Blood, Long> {
     List<Blood> findByExpirationDateBefore(LocalDate date);
-
+    Optional<Blood> findByBloodRegisterId(Long bloodRegisterId);
 
 }

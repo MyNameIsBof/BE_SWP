@@ -19,15 +19,15 @@ import java.time.LocalDateTime;
 @Builder
 public class BloodRegisterProcessRequest {
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Blood type is required")
+    @NotNull(message = "Nhóm máu là bắt buộc")
     BloodType bloodType;
 
-    @NotNull(message = "Quantity is required")
-    @Positive(message = "Quantity must be positive")
+    @NotNull(message = "Số lượng là bắt buộc")
+    @Positive(message = "Số lượng phải là số dương")
     float quantity;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    @NotNull(message = "Donation date is required")
-    @PastOrPresent(message = "Donation date cannot be in the future")
+    @NotNull(message = "Ngày hiến máu là bắt buộc")
+    @PastOrPresent(message = "Ngày hiến máu phải là ngày trong quá khứ hoặc hiện tại")
     LocalDateTime donationDate;
 }
