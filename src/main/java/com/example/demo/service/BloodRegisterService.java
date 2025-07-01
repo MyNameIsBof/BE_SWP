@@ -44,6 +44,9 @@ public class BloodRegisterService {
     @Autowired
     BloodRepository bloodRepository;
 
+    @Autowired
+    NotificationService notificationService;
+
     public List<BloodRegisterListResponse> getAll() {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
@@ -77,6 +80,12 @@ public class BloodRegisterService {
         bloodRegister.setStatus(BloodRegisterStatus.PENDING);
         bloodRegister.setUser(currentUser);;
         bloodRegisterRepository.save(bloodRegister);
+
+        // Create notification for blood donation registration
+        String donationMessage = "Blood type: " + currentUser.getBloodType() + 
+                               ", Date: " + bloodRegisterRequest.getWantedDate() + 
+                               ", Time: " + bloodRegisterRequest.getWantedHour();
+        notificationService.createBloodRequestNotification(currentUser, "Blood donation registration: " + donationMessage);
 
 // BloodRegisterResponse
         BloodRegisterResponse bloodRegisterResponse = BloodRegisterResponse.builder()
@@ -275,6 +284,13 @@ public class BloodRegisterService {
             // 3. Cập nhật trạng thái đơn đăng ký
             bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
             bloodRegisterRepository.save(bloodRegister);
+
+            // Create notification for completed blood donation
+            String completionMessage = "Blood donation completed successfully. " +
+                                     "Blood type: " + bloodRegister.getUser().getBloodType() +
+                                     ", Units donated: " + bloodSetCompletedRequest.getUnit() + 
+                                     ", Date: " + bloodSetCompletedRequest.getImplementationDate();
+            notificationService.createDonationCompletedNotification(bloodRegister.getUser(), completionMessage);
 
             // 5. Chuyển sang response trả về
             return BloodRegisterResponse.builder()

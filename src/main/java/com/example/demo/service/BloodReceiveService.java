@@ -33,6 +33,7 @@ public class BloodReceiveService {
     private final BloodReceiveMapper bloodReceiveMapper;
     private final AuthenticationService authenticationService;
     private final BloodInventoryRepository bloodInventoryRepository;
+    private final NotificationService notificationService;
 
 
     public List<BloodReceiveListResponse> getAll() {
@@ -95,6 +96,16 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         bloodReceive.setWantedDate(request.getWantedDate());
         bloodReceive.setWantedHour(request.getWantedHour());
         bloodReceiveRepository.save(bloodReceive);
+
+        // Create notification for blood request
+        String notificationMessage = "Blood type: " + currentUser.getBloodType() + 
+                                   ", Date: " + request.getWantedDate() + 
+                                   ", Time: " + request.getWantedHour();
+        if (request.isEmergency()) {
+            notificationService.createEmergencyRequestNotification(currentUser, notificationMessage);
+        } else {
+            notificationService.createBloodRequestNotification(currentUser, notificationMessage);
+        }
 
         return createResponseFromUserAndReceive(currentUser, bloodReceive);
     }
@@ -259,6 +270,12 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
         receive.setStatus(BloodReceiveStatus.COMPLETED);
         bloodReceiveRepository.save(receive);
+
+        // Create notification for completed blood receive
+        String completionMessage = "Blood transfusion completed successfully. " +
+                                 "Blood type: " + receive.getUser().getBloodType() +
+                                 ", Units received: " + requiredUnits;
+        notificationService.createDonationCompletedNotification(receive.getUser(), completionMessage);
 
         return createResponseFromUserAndReceive(currentUser, receive);
     }
