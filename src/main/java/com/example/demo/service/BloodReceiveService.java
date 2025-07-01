@@ -33,6 +33,8 @@ public class BloodReceiveService {
     private final BloodReceiveMapper bloodReceiveMapper;
     private final AuthenticationService authenticationService;
     private final BloodInventoryRepository bloodInventoryRepository;
+    private final NotificationService notificationService;
+    private final EmailNotificationService emailNotificationService;
 
 
     public List<BloodReceiveListResponse> getAll() {
@@ -143,6 +145,12 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                     throw new AuthenticationException("Bạn không có quyền duyệt đơn");
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.APPROVED);
+                
+                // Send appointment confirmation notification
+                String appointmentDetails = String.format("Blood Receive Date: %s at %s", 
+                    bloodReceive.getWantedDate(), bloodReceive.getWantedHour());
+                notificationService.createAppointmentConfirmation(bloodReceive.getUser(), appointmentDetails);
+                emailNotificationService.sendAppointmentConfirmationEmail(bloodReceive.getUser(), appointmentDetails);
                 break;
             case REJECTED:
                 if (currentUser.getRole() != Role.ADMIN) {

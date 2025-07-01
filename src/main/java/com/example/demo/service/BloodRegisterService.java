@@ -44,6 +44,12 @@ public class BloodRegisterService {
     @Autowired
     BloodRepository bloodRepository;
 
+    @Autowired
+    NotificationService notificationService;
+
+    @Autowired
+    EmailNotificationService emailNotificationService;
+
     public List<BloodRegisterListResponse> getAll() {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
@@ -171,6 +177,12 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.APPROVED);
                     bloodRegisterRepository.save(bloodRegister);
+                    
+                    // Send appointment confirmation notification
+                    String appointmentDetails = String.format("Date: %s at %s", 
+                        bloodRegister.getWantedDate(), bloodRegister.getWantedHour());
+                    notificationService.createAppointmentConfirmation(bloodRegister.getUser(), appointmentDetails);
+                    emailNotificationService.sendAppointmentConfirmationEmail(bloodRegister.getUser(), appointmentDetails);
                 }
                 case REJECTED -> {
                     if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
