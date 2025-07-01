@@ -154,24 +154,43 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                     throw new AuthenticationException("Bạn không có quyền duyệt đơn");
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.APPROVED);
+                notificationService.createSystemAnnouncementNotification(
+                    bloodReceive.getUser(),
+                    "Blood Request Approved",
+                    "Your blood request has been approved and is being processed."
+                );
                 break;
             case REJECTED:
                 if (currentUser.getRole() != Role.ADMIN) {
                     throw new AuthenticationException("Bạn không có quyền từ chối đơn");
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.REJECTED);
+                notificationService.createSystemAnnouncementNotification(
+                    bloodReceive.getUser(),
+                    "Blood Request Rejected",
+                    "Your blood request has been rejected. Please contact support for more information."
+                );
                 break;
             case COMPLETED:
                 if (currentUser.getRole() != Role.STAFF) {
                     throw new AuthenticationException("Bạn không có quyền đánh dấu đơn hoàn thành");
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.COMPLETED);
+                notificationService.createDonationCompletedNotification(
+                    bloodReceive.getUser(),
+                    "Blood transfusion completed successfully."
+                );
                 break;
             case INCOMPLETED:
                 if (currentUser.getRole() != Role.STAFF) {
                     throw new AuthenticationException("Bạn không có quyền đánh dấu đơn chưa hoàn thành");
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.INCOMPLETED);
+                notificationService.createSystemAnnouncementNotification(
+                    bloodReceive.getUser(),
+                    "Blood Request Incomplete",
+                    "Your blood request could not be completed. Please contact the medical staff."
+                );
                 break;
             case CANCELED:
                 if (!bloodReceive.getUser().getEmail().equals(currentUser.getEmail()) &&
@@ -179,6 +198,11 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                     throw new AuthenticationException("Bạn không có quyền hủy đơn này");
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.CANCELED);
+                notificationService.createSystemAnnouncementNotification(
+                    bloodReceive.getUser(),
+                    "Blood Request Cancelled",
+                    "Your blood request has been cancelled."
+                );
                 break;
             default:
                 throw new AuthenticationException("Trạng thái không hợp lệ");

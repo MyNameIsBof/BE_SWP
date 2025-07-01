@@ -180,6 +180,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.APPROVED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Approved",
+                        "Your blood donation registration has been approved. Please arrive at the scheduled time."
+                    );
                 }
                 case REJECTED -> {
                     if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
@@ -187,6 +192,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.REJECTED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Rejected",
+                        "Your blood donation registration has been rejected. Please contact support for more information."
+                    );
                 }
                 case INCOMPLETED -> {
                     if (authenticationService.getCurrentUser().getRole() != Role.STAFF) {
@@ -194,6 +204,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.INCOMPLETED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Incomplete",
+                        "Your blood donation could not be completed. Please contact the medical staff."
+                    );
                 }
                 case CANCELED -> {
                     User currentUser = authenticationService.getCurrentUser();
@@ -202,6 +217,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.CANCELED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Cancelled",
+                        "Your blood donation registration has been cancelled."
+                    );
                     break;
                 }
                 default -> throw new GlobalException("Trạng thái không hợp lệ");
