@@ -44,6 +44,9 @@ public class BloodRegisterService {
     @Autowired
     BloodRepository bloodRepository;
 
+    @Autowired
+    NotificationService notificationService;
+
     public List<BloodRegisterListResponse> getAll() {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
@@ -77,6 +80,12 @@ public class BloodRegisterService {
         bloodRegister.setStatus(BloodRegisterStatus.PENDING);
         bloodRegister.setUser(currentUser);;
         bloodRegisterRepository.save(bloodRegister);
+
+        // Create notification for blood donation registration
+        String donationMessage = "Blood type: " + currentUser.getBloodType() + 
+                               ", Date: " + bloodRegisterRequest.getWantedDate() + 
+                               ", Time: " + bloodRegisterRequest.getWantedHour();
+        notificationService.createBloodRequestNotification(currentUser, "Blood donation registration: " + donationMessage);
 
 // BloodRegisterResponse
         BloodRegisterResponse bloodRegisterResponse = BloodRegisterResponse.builder()
@@ -171,6 +180,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.APPROVED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Approved",
+                        "Your blood donation registration has been approved. Please arrive at the scheduled time."
+                    );
                 }
                 case REJECTED -> {
                     if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
@@ -178,6 +192,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.REJECTED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Rejected",
+                        "Your blood donation registration has been rejected. Please contact support for more information."
+                    );
                 }
                 case INCOMPLETED -> {
                     if (authenticationService.getCurrentUser().getRole() != Role.STAFF) {
@@ -185,6 +204,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.INCOMPLETED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Incomplete",
+                        "Your blood donation could not be completed. Please contact the medical staff."
+                    );
                 }
                 case CANCELED -> {
                     User currentUser = authenticationService.getCurrentUser();
@@ -193,6 +217,11 @@ public class BloodRegisterService {
                     }
                     bloodRegister.setStatus(BloodRegisterStatus.CANCELED);
                     bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                        bloodRegister.getUser(),
+                        "Blood Donation Cancelled",
+                        "Your blood donation registration has been cancelled."
+                    );
                     break;
                 }
                 default -> throw new GlobalException("Trạng thái không hợp lệ");
@@ -275,6 +304,13 @@ public class BloodRegisterService {
             // 3. Cập nhật trạng thái đơn đăng ký
             bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
             bloodRegisterRepository.save(bloodRegister);
+
+            // Create notification for completed blood donation
+            String completionMessage = "Blood donation completed successfully. " +
+                                     "Blood type: " + bloodRegister.getUser().getBloodType() +
+                                     ", Units donated: " + bloodSetCompletedRequest.getUnit() + 
+                                     ", Date: " + bloodSetCompletedRequest.getImplementationDate();
+            notificationService.createDonationCompletedNotification(bloodRegister.getUser(), completionMessage);
 
             // 5. Chuyển sang response trả về
             return BloodRegisterResponse.builder()

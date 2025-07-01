@@ -54,6 +54,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true )
     List<BloodRegister> recive;
 
+    @OneToMany(mappedBy = "recipient", orphanRemoval = true)
+    List<Notification> notifications;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
