@@ -13,6 +13,7 @@ import com.example.demo.mapper.NotificationMapper;
 import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
     
     private final NotificationRepository notificationRepository;
@@ -102,6 +104,11 @@ public class NotificationService {
     // Internal methods for system-generated notifications
     @Transactional
     public void createDonationReminder(User user) {
+        if (user == null) {
+            log.warn("Cannot create donation reminder - user is null");
+            return;
+        }
+        
         NotificationRequest request = new NotificationRequest();
         request.setTitle("Donation Reminder");
         request.setMessage("You are now eligible to donate blood again. Your last donation was more than 90 days ago.");
@@ -115,9 +122,15 @@ public class NotificationService {
     
     @Transactional
     public void createAppointmentConfirmation(User user, String appointmentDetails) {
+        if (user == null) {
+            log.warn("Cannot create appointment confirmation - user is null");
+            return;
+        }
+        
         NotificationRequest request = new NotificationRequest();
         request.setTitle("Appointment Confirmed");
-        request.setMessage("Your blood donation/receive appointment has been confirmed: " + appointmentDetails);
+        request.setMessage("Your blood donation/receive appointment has been confirmed: " + 
+            (appointmentDetails != null ? appointmentDetails : "No details provided"));
         request.setType(NotificationType.APPOINTMENT_CONFIRMATION);
         request.setUserId(user.getId());
         

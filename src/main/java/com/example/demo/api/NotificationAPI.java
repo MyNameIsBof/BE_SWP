@@ -32,6 +32,10 @@ public class NotificationAPI {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         
+        // Validate pagination parameters
+        if (page < 0) page = 0;
+        if (size <= 0 || size > 100) size = 10;
+        
         Page<NotificationListResponse> notifications = notificationService.getUserNotifications(page, size);
         return ResponseEntity.ok(notifications);
     }
@@ -71,7 +75,16 @@ public class NotificationAPI {
     public ResponseEntity<String> sendEmergencyRequest(
             @RequestParam String bloodType,
             @RequestParam String message) {
-        notificationSchedulerService.sendEmergencyBloodRequest(bloodType, message);
+        
+        // Validate input parameters
+        if (bloodType == null || bloodType.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Blood type is required");
+        }
+        if (message == null || message.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Message is required");
+        }
+        
+        notificationSchedulerService.sendEmergencyBloodRequest(bloodType.trim(), message.trim());
         return ResponseEntity.ok("Emergency blood request sent successfully");
     }
 }
