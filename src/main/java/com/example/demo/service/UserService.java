@@ -74,31 +74,6 @@ public class UserService {
             return userResponse;
     }
 
-    public EmailPasswordResponse updateEmailPassword(EmailPasswordRequest emailPasswordRequest) {
-        User currentUser = authenticationService.getCurrentUser();
-        if (!emailPasswordRequest.getEmail().equals(currentUser.getEmail())) {
-            throw new AuthenticationException("Bạn không có quyền cập nhật email này");
-        }
-        if (currentUser != null) {
-            String password = passwordEncoder.encode(emailPasswordRequest.getPassword());
-            currentUser.setEmail(emailPasswordRequest.getEmail());
-            currentUser.setPassword(password);
-            authenticationRepository.save(currentUser);
-
-            EmailDetail emailDetail = new EmailDetail();
-            emailDetail.setRecipient(currentUser.getEmail());
-            emailDetail.setSubject("Welcome to Blood Donation System");
-            emailService.sendMail(emailDetail);
-
-            EmailPasswordResponse emailPasswordResponse = EmailPasswordResponse.builder()
-                    .email(emailPasswordRequest.getEmail())
-                    .build();
-            return emailPasswordResponse;
-        } else {
-            throw new AuthenticationException("User not found");
-        }
-    }
-
     public List<UserResponse> getUsersExceptAdmin() {
         User currentUser = authenticationService.getCurrentUser();
         if (currentUser == null || !currentUser.getRole().equals(Role.ADMIN)) {
