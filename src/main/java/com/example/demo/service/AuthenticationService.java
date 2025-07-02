@@ -42,18 +42,22 @@ public class AuthenticationService implements UserDetailsService {
     BloodTypeRepository bloodTypeRepository;
 
     public RegisterResponse register(RegisterRequest request){
-        System.out.println(request.getPassword());
-        String password = passwordEncoder.encode(request.getPassword());
-        User newUser = userMapper.toUser(request);
-        newUser.setRole(Role.MEMBER);
-        newUser.setPassword(password);
-        newUser.setBloodType(request.getBloodType());
-        RegisterResponse response = RegisterResponse.builder()
-                .email(newUser.getEmail())
-                .build();
+        try{
+            System.out.println(request.getPassword());
+            String password = passwordEncoder.encode(request.getPassword());
+            User newUser = userMapper.toUser(request);
+            newUser.setRole(Role.MEMBER);
+            newUser.setPassword(password);
+            newUser.setBloodType(request.getBloodType());
+            RegisterResponse response = RegisterResponse.builder()
+                    .email(newUser.getEmail())
+                    .build();
             authenticationRepository.save(newUser);
 
-        return response;
+            return response;
+        } catch (Exception e){
+            throw new AuthenticationException("Email đã được sử dụng");
+        }
     }
     public LoginResponse login(LoginRequest loginRequest){
 
@@ -69,7 +73,7 @@ public class AuthenticationService implements UserDetailsService {
             };
         }
 
-        User user = authenticationRepository.findAccountByEmail(loginRequest.email);
+        User user = authenticationRepository.findUserByEmail(loginRequest.email);
 
         LoginResponse response = userMapper.toUserResponse(user);
         response.setBloodType(user.getBloodType());
@@ -82,13 +86,13 @@ public class AuthenticationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return authenticationRepository.findAccountByEmail(email);
+        return authenticationRepository.findUserByEmail(email);
     }
 
     public User getCurrentUser() {
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return authenticationRepository.findAccountByEmail(email);
+        return authenticationRepository.findUserByEmail(email);
     }
 
 
