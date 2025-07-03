@@ -1,6 +1,7 @@
 package com.example.demo.dto.request;
 
 import com.example.demo.entity.Blood;
+import com.example.demo.enums.BloodInventoryStatus;
 import com.example.demo.enums.BloodType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
@@ -27,4 +28,6 @@ public class BloodInventoryRequest {
 
         @NotNull(message = "Ngày hết hạn không được để trống")
         java.time.LocalDateTime expirationDate;
+
+        BloodInventoryStatus status;
 }
