@@ -5,6 +5,7 @@ import com.example.demo.dto.response.BloodInventoryResponse;
 import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.User;
+import com.example.demo.enums.BloodInventoryStatus;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
@@ -43,10 +44,14 @@ public class BloodInventoryService {
             List<BloodInventoryResponse> responseList = new ArrayList<>();
 
             for (BloodType type : BloodType.values()) {
-                List<BloodInventory> inventoryList = bloodInventoryRepository.findAllByBloodType(type);
+                List<BloodInventory> inventoryList = bloodInventoryRepository.findAllByBloodType(type)
+                        .stream()
+                        .filter(inventory -> BloodInventoryStatus.AVAILABLE.equals(inventory.getStatus()))
+                        .toList();
+
                 BloodInventoryResponse response = new BloodInventoryResponse();
                 response.setBloodType(type);
-                float totalUnit = (float) inventoryList.stream()//
+                float totalUnit = (float) inventoryList.stream()
                         .mapToDouble(BloodInventory::getUnitsAvailable)
                         .sum();
 
@@ -80,14 +85,17 @@ public class BloodInventoryService {
 
     public BloodInventoryResponse create(BloodInventoryRequest req) {
         User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền tạo kho máu");
         }
         try {
-            BloodInventory saved = bloodInventoryRepository.save(toEntity(req));
+            BloodInventory entity = toEntity(req);
+            if (entity.getStatus() == null) {
+                entity.setStatus(BloodInventoryStatus.AVAILABLE);
+            }
+            BloodInventory saved = bloodInventoryRepository.save(entity);
             return toResponse(saved);
         } catch (Exception e) {
-            // Use GlobalException consistently
             throw new GlobalException("Lỗi khi tạo mới kho máu");
         }
     }
@@ -113,22 +121,21 @@ public class BloodInventoryService {
         }
     }
 
+
     public void delete(Long id) {
         User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền xóa kho máu");
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền xoá kho máu");
         }
         try {
-            if (!bloodInventoryRepository.existsById(id)) {
-                // Use ResourceNotFoundException consistently
-                throw new ResourceNotFoundException("Không tìm thấy kho máu với ID: " + id);
-            }
-            bloodInventoryRepository.deleteById(id);
+            BloodInventory inventory = bloodInventoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kho máu với ID: " + id));
+            inventory.setStatus(BloodInventoryStatus.DELETED);
+            bloodInventoryRepository.save(inventory);
         } catch (ResourceNotFoundException e) {
-            // Let ResourceNotFoundException propagate up without wrapping
             throw e;
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi xóa kho máu với ID: " + id);
+            throw new GlobalException("Lỗi khi thực hiện xoá mềm kho máu với ID: " + id);
         }
     }
 

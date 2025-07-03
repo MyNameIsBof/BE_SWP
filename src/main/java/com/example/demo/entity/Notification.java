@@ -19,26 +19,19 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     String title;
-
     @Column(columnDefinition = "TEXT")
     String message;
-
     @Enumerated(EnumType.STRING)
     NotificationType type;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
     @JsonIgnore
     User recipient;
-
     @Column(name = "is_read")
     boolean isRead = false;
-
     @Column(name = "created_at")
     LocalDateTime createdAt;
-
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
