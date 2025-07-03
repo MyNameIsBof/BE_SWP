@@ -28,7 +28,7 @@ public class NotificationAPI {
     private final AuthenticationService authenticationService;
 
     @GetMapping
-    @Operation(summary = "Get notification list for current user")
+    @Operation(summary = "Lấy danh sách thông báo cho người dùng hiện tại")
     public ResponseEntity<List<NotificationResponse>> getNotifications() {
         User currentUser = authenticationService.getCurrentUser();
         List<NotificationResponse> notifications = notificationService.getNotificationsByUser(currentUser);
@@ -36,7 +36,7 @@ public class NotificationAPI {
     }
 
     @GetMapping("/unread-count")
-    @Operation(summary = "Get unread notification count for current user")
+    @Operation(summary = "Nhận số lượng thông báo chưa đọc cho người dùng hiện tại")
     public ResponseEntity<UnreadCountResponse> getUnreadCount() {
         User currentUser = authenticationService.getCurrentUser();
         UnreadCountResponse response = notificationService.getUnreadCount(currentUser);
@@ -44,7 +44,7 @@ public class NotificationAPI {
     }
 
     @PutMapping("/{id}/mark-read")
-    @Operation(summary = "Mark notification as read")
+    @Operation(summary = "Đánh dấu thông báo là đã đọc")
     public ResponseEntity<NotificationResponse> markAsRead(@PathVariable Long id) {
         User currentUser = authenticationService.getCurrentUser();
         NotificationResponse response = notificationService.markAsRead(id, currentUser);
@@ -52,7 +52,7 @@ public class NotificationAPI {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete notification")
+    @Operation(summary = "Xóa thông báo")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
         User currentUser = authenticationService.getCurrentUser();
         notificationService.deleteNotification(id, currentUser);
@@ -60,7 +60,7 @@ public class NotificationAPI {
     }
 
     @PutMapping("/mark-all-read")
-    @Operation(summary = "Mark all notifications as read for current user")
+    @Operation(summary = "Đánh dấu tất cả thông báo là đã đọc")
     public ResponseEntity<Void> markAllAsRead() {
         User currentUser = authenticationService.getCurrentUser();
         notificationService.markAllAsRead(currentUser);
@@ -69,28 +69,28 @@ public class NotificationAPI {
 
     // Admin endpoints
     @PostMapping("/create")
-    @Operation(summary = "Create notification (Admin only)")
+    @Operation(summary = "Tạo 1 thông báo mới (Admin only)")
     public ResponseEntity<NotificationResponse> createNotification(@Valid @RequestBody NotificationCreateRequest request) {
         NotificationResponse response = notificationService.createNotification(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Get notifications for specific user (Admin only)")
+    @Operation(summary = "Lấy danh sách thông báo cho người dùng theo ID (Admin only)")
     public ResponseEntity<List<NotificationResponse>> getNotificationsByUserId(@PathVariable Long userId) {
         List<NotificationResponse> notifications = notificationService.getNotificationsByUserId(userId);
         return ResponseEntity.ok(notifications);
     }
 
     @GetMapping("/user/{userId}/unread-count")
-    @Operation(summary = "Get unread count for specific user (Admin only)")
+    @Operation(summary = "Nhận số lượng thông báo chưa đọc cho người dùng theo ID (Admin only)")
     public ResponseEntity<UnreadCountResponse> getUnreadCountByUserId(@PathVariable Long userId) {
         UnreadCountResponse response = notificationService.getUnreadCountByUserId(userId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/user/{userId}/mark-all-read")
-    @Operation(summary = "Mark all notifications as read for specific user (Admin only)")
+    @Operation(summary = "Đánh dấu tất cả thông báo là đã đọc cho người dùng theo ID (Admin only)")
     public ResponseEntity<Void> markAllAsReadForUser(@PathVariable Long userId) {
         notificationService.markAllAsReadForUser(userId);
         return ResponseEntity.ok().build();

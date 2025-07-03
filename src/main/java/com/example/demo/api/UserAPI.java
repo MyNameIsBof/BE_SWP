@@ -27,11 +27,13 @@ public class UserAPI {
     private final PasswordResetService passwordResetService;
     private final UserService updateUserService;
     @PutMapping("update-user")
+    @Operation(summary = "Cập nhật thông tin người dùng")
     public ResponseEntity<UserResponse> update(@RequestBody UserRequest userRequest) {
         return ResponseEntity.ok(updateUserService.updateUser(userRequest));
     }
 
     @GetMapping("get-user-by-role")
+    @Operation(summary = "Lấy danh sách người dùng trừ admin")
     public ResponseEntity<?> getListUserByRole() {
         return ResponseEntity.ok(updateUserService.getUsersExceptAdmin());
     }

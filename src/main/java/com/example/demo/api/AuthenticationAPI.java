@@ -6,6 +6,7 @@ import com.example.demo.entity.User;
 import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,13 @@ public class AuthenticationAPI {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Đăng ký người dùng mới")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Đăng nhập người dùng")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse response = authenticationService.login(loginRequest);
         return ResponseEntity.ok(response);

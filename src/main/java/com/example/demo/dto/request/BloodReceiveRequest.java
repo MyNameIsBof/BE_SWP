@@ -40,7 +40,7 @@ public class BloodReceiveRequest {
     LocalDate lastDonation;
 
     @Size(max = 1000, message = "Tiền sử y tế phải ít hơn 1000 ký tự")
-    @Schema(example = "Phẫu thuật trước đây vào năm 2018. Không có dị ứng đã biết.", description = "Tiền sử y tế liên quan của bệnh nhân")
+    @Schema(example = "Không có", description = "Tiền sử y tế liên quan của bệnh nhân")
     String medicalHistory;
 
     @NotNull(message = "Nhóm máu là bắt buộc")
