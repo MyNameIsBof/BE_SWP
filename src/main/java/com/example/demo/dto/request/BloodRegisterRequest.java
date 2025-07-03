@@ -42,7 +42,7 @@ public class BloodRegisterRequest {
     @Schema(example = "2023-10-05", description = "Ngày hiến máu gần nhất")
     LocalDate lastDonation;
 
-    @Schema(example = "Không có bệnh mãn tính", description = "Ghi chú lịch sử y tế của bệnh nhân")
+    @Schema(example = "Không có", description = "Ghi chú lịch sử y tế của bệnh nhân")
     String medicalHistory;
 
     @NotNull(message = "Nhóm máu là bắt buộc")

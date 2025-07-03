@@ -29,7 +29,7 @@ public class UserRequest {
     @Pattern(regexp = "^(0|\\+84)[0-9]{9,10}$", message = "Số điện thoại không hợp lệ")
     String phone;
 
-    @Schema(description = "Địa chỉ nơi cư trú", example = "TP.HCM")
+    @Schema(description = "Địa chỉ nơi cư trú", example = "Ho Chi Minh")
     @NotBlank(message = "Địa chỉ không được để trống") // Address cannot be empty
     String address;
 
