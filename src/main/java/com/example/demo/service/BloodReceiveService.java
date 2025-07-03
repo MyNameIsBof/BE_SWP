@@ -305,10 +305,6 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
     }
 
     public List<BloodReceiveListResponse> getByUserId(Long userId) {
-        User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu của người dùng");
-        }
         List<BloodReceive> bloodReceives = bloodReceiveRepository.findByUserId(userId);
 
         if (bloodReceives.isEmpty()) {

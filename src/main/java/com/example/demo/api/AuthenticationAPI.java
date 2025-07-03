@@ -42,7 +42,7 @@ public class AuthenticationAPI {
     // API endpoint để lấy thông tin người dùng theo email
     @GetMapping("/find-by-email")
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
-        User user = authenticationRespository.findAccountByEmail(email);
+        User user = authenticationRespository.findUserByEmail(email);
         return ResponseEntity.ok(user);
     }
 
