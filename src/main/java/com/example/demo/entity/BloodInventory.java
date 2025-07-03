@@ -1,14 +1,10 @@
 package com.example.demo.entity;
 
+import com.example.demo.enums.BloodInventoryStatus;
 import com.example.demo.enums.BloodType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -27,4 +23,6 @@ public class BloodInventory {
     float unitsAvailable;
     @OneToOne(mappedBy = "bloodInventory")
     Blood bloods;
+    @Enumerated(EnumType.STRING)
+    BloodInventoryStatus status;
 }

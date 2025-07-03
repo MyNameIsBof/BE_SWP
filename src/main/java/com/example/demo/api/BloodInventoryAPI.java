@@ -44,7 +44,7 @@ public class BloodInventoryAPI {
         return ResponseEntity.ok(service.update(id, request));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @PatchMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
