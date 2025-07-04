@@ -61,7 +61,7 @@ public class NotificationService {
     public List<NotificationResponse> getNotificationsByUserId(Long userId) {
         List<Notification> notifications = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId);
         return notifications.stream()
-                .map(notificationMapper::toNotificationResponse)
+                .map(notificationMapper::toNotificationResponse)//trả về danh sách thông báo của người dùng theo ID
                 .collect(Collectors.toList());
     }
 

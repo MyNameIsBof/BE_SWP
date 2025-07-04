@@ -38,30 +38,24 @@ public class BloodInventoryService {
     public List<BloodInventoryResponse> getAll() {
         User currentUser = authenticationService.getCurrentUser();
         if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất danh sách kho máu");
+            throw new GlobalException("Bạn không có quyền truy xuất kho máu");
         }
+
+        // Fetch all blood inventory records
         try {
-            List<BloodInventoryResponse> responseList = new ArrayList<>();
+            List<BloodInventory> inventories = bloodInventoryRepository.findAll();
+            List<BloodInventoryResponse> responses = new ArrayList<>();
 
-            for (BloodType type : BloodType.values()) {
-                List<BloodInventory> inventoryList = bloodInventoryRepository.findAllByBloodType(type)
-                        .stream()
-                        .filter(inventory -> BloodInventoryStatus.AVAILABLE.equals(inventory.getStatus()))
-                        .toList();
-
-                BloodInventoryResponse response = new BloodInventoryResponse();
-                response.setBloodType(type);
-                float totalUnit = (float) inventoryList.stream()
-                        .mapToDouble(BloodInventory::getUnitsAvailable)
-                        .sum();
-
-                response.setUnitsAvailable(totalUnit);
-                responseList.add(response);
+            for (BloodInventory inventory : inventories) {
+                // Use the safeEnum method to handle invalid enum values
+                BloodInventoryStatus safeStatus = BloodInventory.safeEnum(inventory.getStatus().name());
+                inventory.setStatus(safeStatus);
+                responses.add(toResponse(inventory)); // Assuming toResponse method exists
             }
 
-            return responseList;
+            return responses;
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi truy xuất danh sách kho máu");
+            throw new GlobalException(e.getMessage());
         }
     }
 
