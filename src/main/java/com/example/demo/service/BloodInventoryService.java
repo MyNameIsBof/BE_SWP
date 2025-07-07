@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BloodInventoryService {
@@ -42,25 +43,18 @@ public class BloodInventoryService {
                 throw new GlobalException("Bạn không có quyền truy xuất kho máu");
             }
 
-            // Fetch all blood inventory records
             List<BloodInventory> inventories = bloodInventoryRepository.findAll();
-            List<BloodInventoryResponse> responses = new ArrayList<>();
 
-            for (BloodInventory inventory : inventories) {
-                // Use the safeEnum method to handle invalid enum values
-                BloodInventoryStatus safeStatus = BloodInventory.safeEnum(inventory.getStatus().name());
-                inventory.setStatus(safeStatus);
-                responses.add(toResponse(inventory)); // Assuming toResponse method exists
-            }
-
-            return responses;
+            return inventories.stream()
+                    .map(this::toResponse)
+                    .collect(Collectors.toList());
         } catch (GlobalException e) {
-            // Handle GlobalException specifically
             throw e;
         } catch (Exception e) {
-            throw new GlobalException(e.getMessage());
+            throw new GlobalException("Lỗi khi truy xuất kho máu: " + e.getMessage());
         }
     }
+
 
     public BloodInventoryResponse getById(Long id) {
         User currentUser = authenticationService.getCurrentUser();
