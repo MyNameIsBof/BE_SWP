@@ -36,13 +36,13 @@ public class BloodInventoryService {
     AuthenticationService authenticationService;
 
     public List<BloodInventoryResponse> getAll() {
-        User currentUser = authenticationService.getCurrentUser();
-        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất kho máu");
-        }
-
-        // Fetch all blood inventory records
         try {
+            User currentUser = authenticationService.getCurrentUser();
+            if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new GlobalException("Bạn không có quyền truy xuất kho máu");
+            }
+
+            // Fetch all blood inventory records
             List<BloodInventory> inventories = bloodInventoryRepository.findAll();
             List<BloodInventoryResponse> responses = new ArrayList<>();
 
@@ -54,6 +54,9 @@ public class BloodInventoryService {
             }
 
             return responses;
+        } catch (GlobalException e) {
+            // Handle GlobalException specifically
+            throw e;
         } catch (Exception e) {
             throw new GlobalException(e.getMessage());
         }
@@ -61,21 +64,26 @@ public class BloodInventoryService {
 
     public BloodInventoryResponse getById(Long id) {
         User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất kho máu");
+
+        // Kiểm tra quyền của người dùng
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất kho máu.");
         }
-        //lấy tất cả thông tin theo id
+
+        // Lấy thông tin kho máu theo id
         try {
             BloodInventory inventory = bloodInventoryRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kho máu với ID: " + id));
+                    .orElseThrow(() -> new GlobalException("Không tìm thấy kho máu với ID: " + id));
             return toResponse(inventory);
-        } catch (ResourceNotFoundException e) {
-            // Let ResourceNotFoundException propagate up without wrapping
+        } catch (GlobalException e) {
+            // Để ngoại lệ ResourceNotFoundException tự động được ném ra
             throw e;
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi truy xuất kho máu với ID: " + id);
+            // Xử lý lỗi chung với thông báo chi tiết hơn
+            throw new GlobalException("Lỗi khi truy xuất kho máu với ID: " + id + ". Lỗi chi tiết: " + e.getMessage());
         }
     }
+
 
     public BloodInventoryResponse create(BloodInventoryRequest req) {
         User currentUser = authenticationService.getCurrentUser();

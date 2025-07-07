@@ -17,5 +17,4 @@ import java.util.Date;
 @Builder
 public class RegisterResponse {
     public String email;
-
 }

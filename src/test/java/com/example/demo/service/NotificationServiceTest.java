@@ -59,7 +59,7 @@ class NotificationServiceTest {
                 .message("Test message")
                 .type(NotificationType.BLOOD_REQUEST)
                 .recipient(testUser)
-                .isRead(false)
+                .read(false)
                 .createdAt(LocalDateTime.now())
                 .build();
 

@@ -14,13 +14,10 @@ import lombok.experimental.FieldDefaults;
 public class NotificationCreateRequest {
     @NotBlank(message = "Title cannot be blank")
     String title;
-
     @NotBlank(message = "Message cannot be blank")
     String message;
-
     @NotNull(message = "Type cannot be null")
     NotificationType type;
-
     @NotNull(message = "Recipient ID cannot be null")
     Long recipientId;
 }
