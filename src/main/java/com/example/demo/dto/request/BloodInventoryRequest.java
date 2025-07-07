@@ -22,10 +22,8 @@ import java.util.List;
 public class BloodInventoryRequest {
     @NotNull(message = "Nhóm máu không được để trống")
         BloodType bloodType;
-
         @Min(value = 1, message = "Đơn vị khả dụng phải có ít nhất 1")
         float unitsAvailable;
-
         @NotNull(message = "Ngày hết hạn không được để trống")
         java.time.LocalDateTime expirationDate;
 

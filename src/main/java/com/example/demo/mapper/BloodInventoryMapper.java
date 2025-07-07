@@ -8,6 +8,8 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface BloodInventoryMapper {
     BloodInventory toBloodInventory(BloodInventoryRequest request);
+
+    @Mapping(source = "inventoryId", target = "inventoryId")
     BloodInventoryResponse toBloodInventoryResponse(BloodInventory bloodInventory);
 
     @Mapping(target = "unitsAvailable", expression = "java((int) request.getUnitsAvailable())")
