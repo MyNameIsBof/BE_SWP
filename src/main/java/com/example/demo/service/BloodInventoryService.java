@@ -36,52 +36,54 @@ public class BloodInventoryService {
     AuthenticationService authenticationService;
 
     public List<BloodInventoryResponse> getAll() {
-        User currentUser = authenticationService.getCurrentUser();
-        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất danh sách kho máu");
-        }
         try {
-            List<BloodInventoryResponse> responseList = new ArrayList<>();
-
-            for (BloodType type : BloodType.values()) {
-                List<BloodInventory> inventoryList = bloodInventoryRepository.findAllByBloodType(type)
-                        .stream()
-                        .filter(inventory -> BloodInventoryStatus.AVAILABLE.equals(inventory.getStatus()))
-                        .toList();
-
-                BloodInventoryResponse response = new BloodInventoryResponse();
-                response.setBloodType(type);
-                float totalUnit = (float) inventoryList.stream()
-                        .mapToDouble(BloodInventory::getUnitsAvailable)
-                        .sum();
-
-                response.setUnitsAvailable(totalUnit);
-                responseList.add(response);
+            User currentUser = authenticationService.getCurrentUser();
+            if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new GlobalException("Bạn không có quyền truy xuất kho máu");
             }
 
-            return responseList;
+            // Fetch all blood inventory records
+            List<BloodInventory> inventories = bloodInventoryRepository.findAll();
+            List<BloodInventoryResponse> responses = new ArrayList<>();
+
+            for (BloodInventory inventory : inventories) {
+                // Use the safeEnum method to handle invalid enum values
+                BloodInventoryStatus safeStatus = BloodInventory.safeEnum(inventory.getStatus().name());
+                inventory.setStatus(safeStatus);
+                responses.add(toResponse(inventory)); // Assuming toResponse method exists
+            }
+
+            return responses;
+        } catch (GlobalException e) {
+            // Handle GlobalException specifically
+            throw e;
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi truy xuất danh sách kho máu");
+            throw new GlobalException(e.getMessage());
         }
     }
 
     public BloodInventoryResponse getById(Long id) {
         User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-            throw new GlobalException("Bạn không có quyền truy xuất kho máu");
+
+        // Kiểm tra quyền của người dùng
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất kho máu.");
         }
-        //lấy tất cả thông tin theo id
+
+        // Lấy thông tin kho máu theo id
         try {
             BloodInventory inventory = bloodInventoryRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kho máu với ID: " + id));
+                    .orElseThrow(() -> new GlobalException("Không tìm thấy kho máu với ID: " + id));
             return toResponse(inventory);
-        } catch (ResourceNotFoundException e) {
-            // Let ResourceNotFoundException propagate up without wrapping
+        } catch (GlobalException e) {
+            // Để ngoại lệ ResourceNotFoundException tự động được ném ra
             throw e;
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi truy xuất kho máu với ID: " + id);
+            // Xử lý lỗi chung với thông báo chi tiết hơn
+            throw new GlobalException("Lỗi khi truy xuất kho máu với ID: " + id + ". Lỗi chi tiết: " + e.getMessage());
         }
     }
+
 
     public BloodInventoryResponse create(BloodInventoryRequest req) {
         User currentUser = authenticationService.getCurrentUser();

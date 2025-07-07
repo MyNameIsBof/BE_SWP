@@ -17,12 +17,26 @@ public class BloodInventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long inventoryId;
-    @Enumerated(EnumType.STRING)// Chỉ định kiểu enum sẽ được lưu dưới dạng chuỗi
+
+    @Enumerated(EnumType.STRING) // Specify that the enum will be stored as a string
     BloodType bloodType;
+
     @Column(name = "units_available")
     float unitsAvailable;
+
     @OneToOne(mappedBy = "bloodInventory")
     Blood bloods;
+
     @Enumerated(EnumType.STRING)
     BloodInventoryStatus status;
+
+    // Safe method to convert string to enum
+    public static BloodInventoryStatus safeEnum(String value) {
+        try {
+            return BloodInventoryStatus.valueOf(value);
+        } catch (IllegalArgumentException e) {
+            // Handle invalid value and return a default value (e.g., AVAILABLE)
+            return BloodInventoryStatus.AVAILABLE; // Default value
+        }
+    }
 }

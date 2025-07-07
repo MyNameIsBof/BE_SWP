@@ -28,7 +28,7 @@ public class NotificationService {
     @Transactional
     public NotificationResponse createNotification(NotificationCreateRequest request) {
         User recipient = authenticationRepository.findById(request.getRecipientId())
-                .orElseThrow(() -> new GlobalException("Recipient not found"));
+                .orElseThrow(() -> new GlobalException("không tìm thấy người dùng với ID: " + request.getRecipientId()));
         
         Notification notification = notificationMapper.toNotification(request);
         notification.setRecipient(recipient);
@@ -44,7 +44,7 @@ public class NotificationService {
                 .message(message)
                 .type(type)
                 .recipient(recipient)
-                .isRead(false)
+                .read(false)
                 .build();
         
         Notification savedNotification = notificationRepository.save(notification);
@@ -61,20 +61,20 @@ public class NotificationService {
     public List<NotificationResponse> getNotificationsByUserId(Long userId) {
         List<Notification> notifications = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId);
         return notifications.stream()
-                .map(notificationMapper::toNotificationResponse)
+                .map(notificationMapper::toNotificationResponse)//trả về danh sách thông báo của người dùng theo ID
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public NotificationResponse markAsRead(Long notificationId, User currentUser) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new GlobalException("Notification not found"));
+                .orElseThrow(() -> new GlobalException("Không tìm thấy thông báo với ID: " + notificationId));
         
         // Check if current user is the recipient
         if (notification.getRecipient().getId() != currentUser.getId()) {
-            throw new GlobalException("Unauthorized to modify this notification");
+            throw new GlobalException("Không được phép sửa đổi thông báo này");
         }
-        
+
         notification.setRead(true);
         Notification savedNotification = notificationRepository.save(notification);
         return notificationMapper.toNotificationResponse(savedNotification);
@@ -83,11 +83,11 @@ public class NotificationService {
     @Transactional
     public void deleteNotification(Long notificationId, User currentUser) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new GlobalException("Notification not found"));
+                .orElseThrow(() -> new GlobalException("Không tìm thấy thông báo với ID: " + notificationId));
         
         // Check if current user is the recipient
         if (notification.getRecipient().getId() != currentUser.getId()) {
-            throw new GlobalException("Unauthorized to delete this notification");
+            throw new GlobalException("Không được phép sửa đổi thông báo này");
         }
         
         notificationRepository.delete(notification);
@@ -121,8 +121,8 @@ public class NotificationService {
     @Transactional
     public void createBloodRequestNotification(User recipient, String details) {
         createNotification(
-                "New Blood Request",
-                "A new blood donation request has been created. " + details,
+                "Yêu cầu máu mới",
+                "Một yêu cầu hiến máu mới đã được tạo. " + details,
                 NotificationType.BLOOD_REQUEST,
                 recipient
         );
@@ -131,8 +131,8 @@ public class NotificationService {
     @Transactional
     public void createEmergencyRequestNotification(User recipient, String details) {
         createNotification(
-                "Emergency Blood Request",
-                "URGENT: Emergency blood donation needed! " + details,
+                "Yêu cầu máu khẩn cấp",
+                "GẤP: Cần hiến máu khẩn cấp!" + details,
                 NotificationType.EMERGENCY_REQUEST,
                 recipient
         );
@@ -141,8 +141,8 @@ public class NotificationService {
     @Transactional
     public void createDonationCompletedNotification(User recipient, String details) {
         createNotification(
-                "Donation Completed",
-                "Your blood donation has been completed successfully. " + details,
+                "Hoàn thành hiến máu",
+                "Việc hiến máu của bạn đã hoàn tất thành công. " + details,
                 NotificationType.DONATION_COMPLETED,
                 recipient
         );
@@ -151,8 +151,8 @@ public class NotificationService {
     @Transactional
     public void createDonationReminderNotification(User recipient, String details) {
         createNotification(
-                "Donation Reminder",
-                "Reminder: Your scheduled blood donation is coming up. " + details,
+                "Nhắc nhở quyên góp",
+                "Nhắc nhở: Lịch hiến máu của bạn sắp đến. " + details,
                 NotificationType.BLOOD_DONATION_REMINDER,
                 recipient
         );
