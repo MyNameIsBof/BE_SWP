@@ -1,22 +1,21 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.EmailDetail;
-import com.example.demo.dto.request.EmailPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
-import com.example.demo.dto.response.EmailPasswordResponse;
+import com.example.demo.dto.response.CheckDonationAbilityResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
+import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -99,6 +98,25 @@ public class UserService {
                 .role(user.getRole())
                 .bloodType(user.getBloodType())
                 .build()).toList();
+    }
+    public CheckDonationAbilityResponse checkHealth(Long id){
+        User currentUser = authenticationRepository.getById(id);
+
+        // Check if birthdate is null first
+        LocalDate birthdate = currentUser.getBirthdate();
+        boolean isAdult = birthdate != null && (2025 - birthdate.getYear() >= 18);
+
+        if(currentUser.getBirthdate() == null) {
+            throw new GlobalException("Ngày sinh không được để trống");
+        }
+
+        if(currentUser.getWeight() >= 45 && isAdult
+                && currentUser.getLastDonation() == null && currentUser.getLastDonation().isBefore(java.time.LocalDate.now().minusMonths(3))) {
+            return CheckDonationAbilityResponse.builder()
+                    .message("Bạn đã đủ điều kiện hiến máu")
+                    .build();
+        }
+        throw new GlobalException("Chưa đủ điều kiện hiến máu");
     }
 }
 
