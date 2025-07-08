@@ -1,7 +1,16 @@
-package com.example.demo.service;
+package com.example.demo.service;https://github.com/MyNameIsBof/BE_SWP/pull/32/conflict?name=src%252Fmain%252Fjava%252Fcom%252Fexample%252Fdemo%252Fapi%252FUserAPI.java&ancestor_oid=88de0a757279fa5f5f61a649fb43e994fcce257a&base_oid=c7bb23cf710f05fd2761081c468691a9ce5ee897&head_oid=e872c301faf12299c5bd50f98cd3ea977ebb4284
+
+
+import com.example.demo.dto.request.EmailDetail;
+import com.example.demo.dto.request.EmailPasswordRequest;
+import com.example.demo.dto.request.UpdateStatusRequest;
+import com.example.demo.dto.request.UserRequest;
+import com.example.demo.dto.response.EmailPasswordResponse;
+import com.example.demo.dto.response.LoginResponse;
 
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.CheckDonationAbilityResponse;
+
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
@@ -10,6 +19,8 @@ import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +80,6 @@ public class UserService {
                     .emergencyPhone(userRequest.getEmergencyPhone())
                     .bloodType(userRequest.getBloodType())
                     .build();
-
             return userResponse;
     }
 
@@ -97,8 +107,24 @@ public class UserService {
                 .emergencyPhone(user.getEmergencyPhone())
                 .role(user.getRole())
                 .bloodType(user.getBloodType())
+                .status(user.getStatus())
                 .build()).toList();
     }
+
+
+    //setStatus
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse updateUserStatus(UpdateStatusRequest request) {
+        User user = authenticationRepository.findById(request.getUserId())
+                .orElseThrow(() -> new GlobalException("Không tìm thấy người dùng với ID: " + request.getUserId()));
+
+        user.setStatus(request.getStatus());
+        authenticationRepository.save(user);
+
+        return userMapper.toUpdateUserResponse(user);
+    }
+
+
     public CheckDonationAbilityResponse checkHealth(Long id){
         User currentUser = authenticationRepository.getById(id);
 
@@ -118,5 +144,6 @@ public class UserService {
         }
         throw new GlobalException("Chưa đủ điều kiện hiến máu");
     }
+
 }
 

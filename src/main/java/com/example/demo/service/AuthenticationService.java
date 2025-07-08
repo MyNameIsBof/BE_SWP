@@ -6,6 +6,7 @@ import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.dto.response.RegisterResponse;
+import com.example.demo.enums.UserStatus;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
@@ -47,6 +48,7 @@ public class AuthenticationService implements UserDetailsService {
             String password = passwordEncoder.encode(request.getPassword());
             User newUser = userMapper.toUser(request);
             newUser.setRole(Role.MEMBER);
+            newUser.setStatus(UserStatus.ACTIVE);
             newUser.setPassword(password);
             newUser.setBloodType(request.getBloodType());
             RegisterResponse response = RegisterResponse.builder()
