@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.EmailDetail;
 import com.example.demo.entity.User;
+import com.example.demo.repository.AuthenticationRepository;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -16,17 +17,18 @@ import org.thymeleaf.context.Context;
 public class EmailService {
 
     @Autowired
-    private TemplateEngine templateEngine;
+    TemplateEngine templateEngine;
 
     @Autowired
-    private JavaMailSender javaMailSender;
+    JavaMailSender javaMailSender;
 
     @Autowired
-    private AuthenticationService authenticationService;
+    AuthenticationRepository authenticationRepository;
 
     public void sendResetOTPMail(String to, String subject, String otp, int expiredMinutes){
-        User currentUser = authenticationService.getCurrentUser();
         try{
+            User currentUser = authenticationRepository.findUserByEmail(to);
+            if (currentUser == null) throw new RuntimeException("Email không tồn tại");
 
             Context context = new Context();
             context.setVariable("name", currentUser.getFullName());
@@ -53,8 +55,10 @@ public class EmailService {
     }
 
     public void sendAcpResetPasswordMail(String to, String subject){
-        User currentUser = authenticationService.getCurrentUser();
+
         try{
+            User currentUser = authenticationRepository.findUserByEmail(to);
+            if (currentUser == null) throw new RuntimeException("Email không tồn tại");
 
             Context context = new Context();
             context.setVariable("name", currentUser.getFullName());
