@@ -83,7 +83,7 @@ class NotificationServiceTest {
                         .title("Test Notification")
                         .message("Test message")
                         .type(NotificationType.BLOOD_REQUEST)
-                        .isRead(false)
+                        .read(false)
                         .recipientName("Test User")
                         .recipientEmail("test@example.com")
                         .build());
@@ -116,7 +116,7 @@ class NotificationServiceTest {
                         .title("Direct Notification")
                         .message("Direct message")
                         .type(NotificationType.EMERGENCY_REQUEST)
-                        .isRead(false)
+                        .read(false)
                         .build());
 
         // Act

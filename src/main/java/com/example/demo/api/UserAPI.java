@@ -1,11 +1,10 @@
 package com.example.demo.api;
 
 
-import com.example.demo.dto.request.EmailPasswordRequest;
 import com.example.demo.dto.request.ForgotPasswordRequest;
 import com.example.demo.dto.request.ResetPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
-import com.example.demo.dto.response.EmailPasswordResponse;
+import com.example.demo.dto.response.CheckDonationAbilityResponse;
 import com.example.demo.dto.response.OTPResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.service.PasswordResetService;
@@ -57,6 +56,12 @@ public class UserAPI {
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         passwordResetService.resetPassword(request);
         return ResponseEntity.ok("Mật khẩu đã được đặt lại thành công");
+    }
+
+    @GetMapping("/check-donation-ability")
+    @Operation(summary = "")
+    public ResponseEntity<CheckDonationAbilityResponse> checkHealth(@RequestParam Long id) {
+        return ResponseEntity.ok(updateUserService.checkHealth(id));
     }
 
 }
