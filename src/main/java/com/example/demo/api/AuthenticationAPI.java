@@ -2,8 +2,10 @@ package com.example.demo.api;
 
 import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.dto.response.LoginResponse;
+import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.dto.request.RegisterRequest;
+import com.example.demo.enums.Role;
 import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +49,12 @@ public class AuthenticationAPI {
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         User user = authenticationRespository.findUserByEmail(email);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/set-role")
+    @Operation(summary = "Cập nhật vai trò của người dùng")
+    public ResponseEntity<?> setRole(@RequestParam String email, @RequestParam Role role) {
+        return ResponseEntity.ok(authenticationService.setRole(email, role));
     }
 
     

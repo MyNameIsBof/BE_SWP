@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/health-check")
@@ -27,6 +24,20 @@ public class HealthCheckAPI {
     @Operation(summary = "Tạo mới kiểm tra sức khỏe cho người hiến máu")
     public ResponseEntity<HealthCheckResponse> create(HealthCheckRequest healthCheckRequest) {
         HealthCheckResponse response = healthCheckService.create(healthCheckRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/update/{id}")
+    @Operation(summary = "Cập nhật thông tin kiểm tra sức khỏe")
+    public ResponseEntity<HealthCheckResponse> update(@PathVariable Long id, @RequestBody HealthCheckRequest healthCheckRequest) {
+        HealthCheckResponse response = healthCheckService.update(id, healthCheckRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get/{id}")
+    @Operation(summary = "Lấy thông tin kiểm tra sức khỏe theo ID")
+    public ResponseEntity<HealthCheckResponse> getById(@PathVariable Long id) {
+        HealthCheckResponse response = healthCheckService.getHealthCheckById(id);
         return ResponseEntity.ok(response);
     }
 }

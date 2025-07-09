@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.HealthCheckStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,12 +28,10 @@ public class HealthCheck {
     String medicalHistory;
     LocalDate checkDate;
     String staffName;
-    @Enumerated(EnumType.STRING)
-    BloodRegisterStatus status;
+    boolean status = false;
+    String reason;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blood_register_id")
-    @JsonIgnore
+    @OneToOne
     BloodRegister bloodRegister;
 
 }

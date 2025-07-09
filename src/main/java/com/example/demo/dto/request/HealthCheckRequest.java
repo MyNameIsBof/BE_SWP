@@ -14,12 +14,12 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class HealthCheckRequest {
-    double height;
-    double weight;
-    double temperature;
-    double bloodPressure;
+    Double height;
+    Double weight;
+    Double temperature;
+    Double bloodPressure;
     LocalDate checkDate;
-    @Enumerated(EnumType.STRING)
-    BloodRegisterStatus status;
+    boolean status;
+    String reason;
     Long bloodRegisterId;
 }

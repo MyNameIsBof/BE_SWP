@@ -7,10 +7,8 @@ import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.exception.exceptions.GlobalException;
-import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,20 +18,10 @@ import java.util.Optional;
 @Service
 public class UserService {
     @Autowired
-    UserMapper userMapper;
-
-    @Autowired
     AuthenticationRepository authenticationRepository;
 
     @Autowired
     AuthenticationService authenticationService;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    EmailService emailService;
-
 
     public UserResponse updateUser(UserRequest userRequest){;
         User currentUser = authenticationService.getCurrentUser();
@@ -102,21 +90,25 @@ public class UserService {
     public CheckDonationAbilityResponse checkHealth(Long id){
         User currentUser = authenticationRepository.getById(id);
 
-        // Check if birthdate is null first
         LocalDate birthdate = currentUser.getBirthdate();
-        boolean isAdult = birthdate != null && (2025 - birthdate.getYear() >= 18);
-
-        if(currentUser.getBirthdate() == null) {
+        if (birthdate == null) {
             throw new GlobalException("Ngày sinh không được để trống");
         }
 
-        if(currentUser.getWeight() >= 45 && isAdult
-                && currentUser.getLastDonation() == null && currentUser.getLastDonation().isBefore(java.time.LocalDate.now().minusMonths(3))) {
+        boolean isAdult = 2025 - birthdate.getYear() >= 18;
+        boolean enoughWeight = currentUser.getWeight() >= 45;
+
+        LocalDate lastDonation = currentUser.getLastDonation();
+        boolean canDonate = (lastDonation == null) || lastDonation.isBefore(LocalDate.now().minusMonths(3));
+
+        if (enoughWeight && isAdult && canDonate) {
             return CheckDonationAbilityResponse.builder()
                     .message("Bạn đã đủ điều kiện hiến máu")
                     .build();
         }
+
         throw new GlobalException("Chưa đủ điều kiện hiến máu");
     }
+
 }
 

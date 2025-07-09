@@ -3,6 +3,7 @@ package com.example.demo.dto.request;
 import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Gender;
+import com.example.demo.enums.HealthCheckStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
