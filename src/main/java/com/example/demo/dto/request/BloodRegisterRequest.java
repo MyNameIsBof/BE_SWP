@@ -45,7 +45,7 @@ public class BloodRegisterRequest {
     @Schema(example = "Không có", description = "Ghi chú lịch sử y tế của bệnh nhân")
     String medicalHistory;
 
-    @NotNull(message = "Nhóm máu là bắt buộc")
+//    @NotNull(message = "Nhóm máu là bắt buộc")
     @Enumerated(EnumType.STRING)
     @Schema(example = "A_POSITIVE", description = "Nhóm máu bệnh nhân")
     BloodType bloodType;
