@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.UpdateStatusRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.CheckDonationAbilityResponse;
 import com.example.demo.dto.response.UserResponse;
@@ -108,6 +109,17 @@ public class UserService {
         }
 
         throw new GlobalException("Chưa đủ điều kiện hiến máu");
+    }
+
+    public void updateUserStatus(UpdateStatusRequest request) {
+        User currentUser = authenticationService.getCurrentUser();
+        if (currentUser == null || !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new AuthenticationException("Bạn không có quyền cập nhật trạng thái người dùng");
+        }
+        User userToUpdate = authenticationRepository.findById(request.getUserId())
+                .orElseThrow(() -> new GlobalException("Người dùng không tồn tại"));
+        userToUpdate.setStatus(request.getStatus());
+        authenticationRepository.save(userToUpdate);
     }
 
 }

@@ -242,6 +242,7 @@ public class BloodRegisterService {
         return bloodRegisters.stream()
                 .map(bloodRegister -> BloodRegisterListResponse.builder()
                         .id(bloodRegister.getId())
+                        .fullName(bloodRegister.getUser().getFullName())
                         .wantedDate(bloodRegister.getWantedDate())
                         .wantedHour(bloodRegister.getWantedHour())
                         .status(bloodRegister.getStatus())
