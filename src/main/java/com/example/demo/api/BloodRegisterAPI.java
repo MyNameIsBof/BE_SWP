@@ -67,7 +67,6 @@ public class BloodRegisterAPI {
         } else {
             result = bloodRegisterService.getAll();
         }
-
         return ResponseEntity.ok(result);
     }
 

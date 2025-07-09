@@ -1,10 +1,15 @@
 package com.example.demo.api;
 
 
+
+import com.example.demo.dto.request.*;
+import com.example.demo.dto.response.EmailPasswordResponse;
+
 import com.example.demo.dto.request.ForgotPasswordRequest;
 import com.example.demo.dto.request.ResetPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.CheckDonationAbilityResponse;
+
 import com.example.demo.dto.response.OTPResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.service.PasswordResetService;
@@ -14,6 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,10 +64,21 @@ public class UserAPI {
         return ResponseEntity.ok("Mật khẩu đã được đặt lại thành công");
     }
 
+
+    @PutMapping("/update-status")
+    @Operation(summary = "Cập nhật trạng thái người dùng (chỉ Admin)")
+    public ResponseEntity<String> updateUserStatus(@Valid @RequestBody UpdateStatusRequest request) {
+        updateUserService.updateUserStatus(request);
+        return ResponseEntity.ok("Cập nhật trạng thái người dùng thành công");
+    }
+
+
+
     @GetMapping("/check-donation-ability")
     @Operation(summary = "")
     public ResponseEntity<CheckDonationAbilityResponse> checkHealth(@RequestParam Long id) {
         return ResponseEntity.ok(updateUserService.checkHealth(id));
     }
+
 
 }

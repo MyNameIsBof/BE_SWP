@@ -314,7 +314,6 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         return bloodReceives.stream()
                 .map(bloodReceive -> BloodReceiveListResponse.builder()
                         .id(bloodReceive.getId())
-                        .fullName(bloodReceive.getUser().getFullName())
                         .status(bloodReceive.getStatus())
                         .wantedDate(bloodReceive.getWantedDate())
                         .wantedHour(bloodReceive.getWantedHour())
