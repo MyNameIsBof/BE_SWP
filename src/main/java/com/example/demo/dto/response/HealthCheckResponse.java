@@ -1,6 +1,7 @@
 package com.example.demo.dto.response;
 
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.HealthCheckStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
@@ -23,7 +24,6 @@ public class HealthCheckResponse {
     String medicalHistory;
     LocalDate checkDate;
     String staffName;
-    @Enumerated(EnumType.STRING)
-    BloodRegisterStatus status;
+    boolean status;
     Long bloodRegisterId;
 }

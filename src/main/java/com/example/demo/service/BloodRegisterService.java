@@ -1,26 +1,26 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.BloodRegisterProcessRequest;
 import com.example.demo.dto.request.BloodRegisterRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
+import com.example.demo.dto.response.BloodRegisterGetAllResponse;
 import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
-import com.example.demo.entity.Blood;
-import com.example.demo.entity.BloodInventory;
-import com.example.demo.entity.User;
+import com.example.demo.dto.response.HistoryResponse;
+import com.example.demo.entity.*;
 import com.example.demo.enums.BloodRegisterStatus;
-import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.mapper.BloodRegisterMapper;
-import com.example.demo.entity.BloodRegister;
 import com.example.demo.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,7 @@ public class BloodRegisterService {
     BloodRegisterMapper bloodRegisterMapper;
 
     @Autowired
-    AuthenticationRepository authenticationRepository;
+    HealthCheckRepository healthCheckRepository;
 
     @Autowired
     AuthenticationService authenticationService;
@@ -56,10 +56,12 @@ public class BloodRegisterService {
         return bloodRegisters.stream()
                 .map(bloodRegister -> BloodRegisterListResponse.builder()
                         .id(bloodRegister.getId())
+                        .fullName(bloodRegister.getUser().getFullName())
                         .wantedDate(bloodRegister.getWantedDate())
                         .wantedHour(bloodRegister.getWantedHour())
                         .status(bloodRegister.getStatus())
                         .bloodType(bloodRegister.getUser().getBloodType())
+                        .healthCheckStatus(bloodRegister.getHealthCheck().isStatus())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -78,13 +80,13 @@ public class BloodRegisterService {
 //        Blood Register Field
         BloodRegister bloodRegister = bloodRegisterMapper.toBloodRegister(bloodRegisterRequest);
         bloodRegister.setStatus(BloodRegisterStatus.PENDING);
-        bloodRegister.setUser(currentUser);;
+        bloodRegister.setUser(currentUser);
         bloodRegisterRepository.save(bloodRegister);
 
         // Create notification for blood donation registration
-        String donationMessage = "Blood type: " + currentUser.getBloodType() + 
-                               ", Date: " + bloodRegisterRequest.getWantedDate() + 
-                               ", Time: " + bloodRegisterRequest.getWantedHour();
+        String donationMessage = "Blood type: " + currentUser.getBloodType() +
+                ", Date: " + bloodRegisterRequest.getWantedDate() +
+                ", Time: " + bloodRegisterRequest.getWantedHour();
         notificationService.createBloodRequestNotification(currentUser, "Blood donation registration: " + donationMessage);
 
 // BloodRegisterResponse
@@ -173,76 +175,105 @@ public class BloodRegisterService {
         BloodRegister bloodRegister = bloodRegisterRepository.findById(id)
                 .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
         // check role and status
-            switch (status) {
-                case APPROVED -> {
-                    if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
-                        throw new GlobalException("Bạn không có quyền duyệt đơn đăng ký");
-                    }
+        switch (status) {
+            case APPROVED -> {
+                if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
+                    throw new GlobalException("Bạn không có quyền duyệt đơn đăng ký");
+                }
+                if(bloodRegister.getStatus().equals(BloodRegisterStatus.PENDING)){
                     bloodRegister.setStatus(BloodRegisterStatus.APPROVED);
                     bloodRegisterRepository.save(bloodRegister);
                     notificationService.createSystemAnnouncementNotification(
-                        bloodRegister.getUser(),
-                        "Blood Donation Approved",
-                        "Your blood donation registration has been approved. Please arrive at the scheduled time."
+                            bloodRegister.getUser(),
+                            "Blood Donation Approved",
+                            "Your blood donation registration has been approved. Please arrive at the scheduled time."
                     );
+
+                }else{
+                    throw new GlobalException("Đơn đăng ký không ở trạng thái chờ duyệt");
                 }
-                case REJECTED -> {
-                    if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
-                        throw new GlobalException("Bạn không có quyền từ chối đơn đăng ký");
-                    }
+
+            }
+            case REJECTED -> {
+                if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
+                    throw new GlobalException("Bạn không có quyền từ chối đơn đăng ký");
+                }
+                if(bloodRegister.getStatus().equals(BloodRegisterStatus.PENDING)){
                     bloodRegister.setStatus(BloodRegisterStatus.REJECTED);
                     bloodRegisterRepository.save(bloodRegister);
                     notificationService.createSystemAnnouncementNotification(
-                        bloodRegister.getUser(),
-                        "Blood Donation Rejected",
-                        "Your blood donation registration has been rejected. Please contact support for more information."
+                            bloodRegister.getUser(),
+                            "Blood Donation Rejected",
+                            "Your blood donation registration has been rejected. Please contact support for more information."
                     );
+                }else{
+                    throw new GlobalException("Đơn đăng ký không ở trạng thái đã duyệt");
                 }
-                case INCOMPLETED -> {
-                    if (authenticationService.getCurrentUser().getRole() != Role.STAFF) {
-                        throw new GlobalException("Bạn không có quyền đánh dấu đơn đăng ký chưa hoàn thành");
-                    }
-                    bloodRegister.setStatus(BloodRegisterStatus.INCOMPLETED);
-                    bloodRegisterRepository.save(bloodRegister);
-                    notificationService.createSystemAnnouncementNotification(
-                        bloodRegister.getUser(),
-                        "Blood Donation Incomplete",
-                        "Your blood donation could not be completed. Please contact the medical staff."
-                    );
+
+            }
+            case CANCELED -> {
+                User currentUser = authenticationService.getCurrentUser();
+                if (!bloodRegister.getUser().getEmail().equals(currentUser.getEmail()) && currentUser.getRole() != Role.MEMBER) {
+                    throw new GlobalException("Bạn không có quyền hủy đơn đăng ký này");
                 }
-                case CANCELED -> {
-                    User currentUser = authenticationService.getCurrentUser();
-                    if (!bloodRegister.getUser().getEmail().equals(currentUser.getEmail()) && currentUser.getRole() != Role.MEMBER) {
-                        throw new GlobalException("Bạn không có quyền hủy đơn đăng ký này");
-                    }
+                if(bloodRegister.getStatus().equals(BloodRegisterStatus.PENDING)){
                     bloodRegister.setStatus(BloodRegisterStatus.CANCELED);
                     bloodRegisterRepository.save(bloodRegister);
                     notificationService.createSystemAnnouncementNotification(
-                        bloodRegister.getUser(),
-                        "Blood Donation Cancelled",
-                        "Your blood donation registration has been cancelled."
-                    );
-                    break;
+                            bloodRegister.getUser(),
+                            "Blood Donation Cancelled",
+                            "Your blood donation registration has been cancelled."    );
+
+                }else{
+                    throw new GlobalException("Đơn đăng ký không ở trạng thái chờ duyệt");
                 }
-                default -> throw new GlobalException("Trạng thái không hợp lệ");
+
+
             }
+            default -> throw new GlobalException("Trạng thái không hợp lệ");
+        }
 
     }
 
 
-   public List<BloodRegisterListResponse> getByStatuses(List<BloodRegisterStatus> statuses) {
-       List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByStatusIn(statuses);
+    public List<BloodRegisterListResponse> getByStatuses(List<BloodRegisterStatus> statuses) {
+        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByStatusIn(statuses);
 
-       return bloodRegisters.stream()
-               .map(bloodRegister -> BloodRegisterListResponse.builder()
-                       .id(bloodRegister.getId())
-                       .wantedDate(bloodRegister.getWantedDate())
-                       .wantedHour(bloodRegister.getWantedHour())
-                       .status(bloodRegister.getStatus())
-                       .bloodType(bloodRegister.getUser().getBloodType())
-                       .build())
-               .collect(Collectors.toList());
-   }
+        return bloodRegisters.stream()
+                .map(bloodRegister -> BloodRegisterListResponse.builder()
+                        .id(bloodRegister.getId())
+                        .wantedDate(bloodRegister.getWantedDate())
+                        .wantedHour(bloodRegister.getWantedHour())
+                        .status(bloodRegister.getStatus())
+                        .bloodType(bloodRegister.getUser().getBloodType())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<HistoryResponse> getHistoryByUserId(Long userId) {
+        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);
+
+        if (bloodRegisters.isEmpty()) {
+            throw new GlobalException("Không tìm thấy lịch sử đăng ký hiến máu cho người dùng này");
+        }
+
+        return bloodRegisters.stream()
+                .filter(bloodRegister -> bloodRegister.getStatus() == BloodRegisterStatus.COMPLETED)
+                .map(bloodRegister -> {
+                    Optional<Blood> bloodOpt = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
+                    float unit = bloodOpt.map(Blood::getUnit).orElse(0f);
+                    LocalDate completedDate = bloodOpt.map(Blood::getDonationDate).orElse(null);
+
+                    return HistoryResponse.builder()
+                            .id(bloodRegister.getUser().getId())
+                            .fullName(bloodRegister.getUser().getFullName())
+                            .completedDate(completedDate)
+                            .unit(unit)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
 
     public List<BloodRegisterListResponse> getByUserId(Long userId) {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);
@@ -263,6 +294,7 @@ public class BloodRegisterService {
 
                     return BloodRegisterListResponse.builder()
                             .id(bloodRegister.getId())
+                            .fullName(bloodRegister.getUser().getFullName())
                             .wantedDate(bloodRegister.getWantedDate())
                             .wantedHour(bloodRegister.getWantedHour())
                             .status(bloodRegister.getStatus())
@@ -273,17 +305,18 @@ public class BloodRegisterService {
                 .collect(Collectors.toList());
     }
 
-        @Transactional
-        public BloodRegisterResponse setCompleted(BloodSetCompletedRequest bloodSetCompletedRequest) {
-            try {
-                User currentUser = authenticationService.getCurrentUser();
-                if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
-                    throw new GlobalException("Bạn không có quyền thêm máu vào kho máu");
-                }
-                // 1. Lấy thông tin đơn đăng ký hiến máu
-                BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodId())
-                        .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
+    @Transactional
+    public BloodRegisterResponse setCompleted(BloodSetCompletedRequest bloodSetCompletedRequest) {
+        try {
+            User currentUser = authenticationService.getCurrentUser();
+            if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new GlobalException("Bạn không có quyền thêm máu vào kho máu");
+            }
+            // 1. Lấy thông tin đơn đăng ký hiến máu
+            BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodId())
+                    .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
 
+            if(bloodRegister.getHealthCheck().isStatus()){
                 //        2. bo vo kho mau
                 BloodInventory bloodInventory = new BloodInventory();
                 bloodInventory.setBloodType(bloodRegister.getUser().getBloodType());
@@ -304,7 +337,6 @@ public class BloodRegisterService {
                 // 3. Cập nhật trạng thái đơn đăng ký
                 bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
                 bloodRegisterRepository.save(bloodRegister);
-
                 // 5. Chuyển sang response trả về
                 return BloodRegisterResponse.builder()
                         .emergencyName(bloodRegister.getUser().getEmergencyName())
@@ -324,8 +356,57 @@ public class BloodRegisterService {
                         .wantedHour(bloodRegister.getWantedHour())
                         .unit(bloodSetCompletedRequest.getUnit())
                         .build();
-            } catch (Exception e) {
-                throw new GlobalException("Đơn đã hoàn thành hoặc không tồn tại");
+            }else{
+                bloodRegister.setStatus(BloodRegisterStatus.INCOMPLETED);
+                bloodRegisterRepository.save(bloodRegister);
+                throw new GlobalException("Đơn đăng ký không đủ điều kiện để hoàn thành");
             }
+
+
+        } catch (Exception e) {
+            throw new GlobalException("Đơn đã hoàn thành hoặc không tồn tại");
         }
+    }
+
+
+
+
+    public List<BloodRegisterGetAllResponse> getListDonation() {
+        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
+        User currentUser = authenticationService.getCurrentUser();
+
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu");
+        }
+
+        // Map userId -> đơn mới nhất của người đó
+        Map<Long, BloodRegister> userLatestRegisterMap = new LinkedHashMap<>();
+        for (BloodRegister br : bloodRegisters) {
+            long userId = br.getUser().getId();
+            // luôn cập nhật để giữ đơn sau cùng (latest entry)
+            userLatestRegisterMap.put(userId, br);
+        }
+
+        return userLatestRegisterMap.values().stream()
+                .map(br -> {
+                    User user = br.getUser();
+                    int completedCount = getCompletedCountByUser(user.getId());
+
+                    return BloodRegisterGetAllResponse.builder()
+                            .id(user.getId()) // ✅ ID người dùng
+                            .fullName(user.getFullName())
+                            .email(user.getEmail())
+                            .phone(user.getPhone())
+                            .bloodType(user.getBloodType())
+                            .lastDonation(user.getLastDonation())
+                            .unitDonation(completedCount)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    public int getCompletedCountByUser(Long userId) {
+        return (int) bloodRegisterRepository.countByUserIdAndStatus(userId, BloodRegisterStatus.COMPLETED);
+    }
+
 }

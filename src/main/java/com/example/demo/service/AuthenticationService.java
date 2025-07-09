@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.LoginRequest;
 import com.example.demo.dto.response.LoginResponse;
+import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.dto.request.RegisterRequest;
@@ -97,6 +98,28 @@ public class AuthenticationService implements UserDetailsService {
         return authenticationRepository.findUserByEmail(email);
     }
 
+    public UserResponse setRole(String email, Role role) {
+        User currentUser = getCurrentUser();
+        if (currentUser.getRole() != Role.ADMIN) {
+            throw new AuthenticationException("Bạn không có quyền thay đổi vai trò người dùng");
+        }
+
+        User user = authenticationRepository.findUserByEmail(email);
+        if(user == null) {
+            throw new AuthenticationException("Người dùng không tồn tại");
+        }
+
+        user.setRole(role);
+        authenticationRepository.save(user);
+
+        System.out.println("Email: " + user.getEmail());
+        System.out.println("Role: " + user.getRole());
+
+        return UserResponse.builder()
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+    }
 
 
 }

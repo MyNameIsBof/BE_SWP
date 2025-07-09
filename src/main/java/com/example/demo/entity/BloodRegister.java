@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.HealthCheckStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -42,7 +43,8 @@ public class BloodRegister {
     @OneToOne(mappedBy = "bloodRegister",cascade = CascadeType.ALL)
     Blood blood;
 
-    @OneToMany(mappedBy = "bloodRegister", cascade = CascadeType.ALL)
-    List<HealthCheck> healthChecks;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "blood_register_id")
+    HealthCheck healthCheck;
 
 }

@@ -44,11 +44,11 @@ public class UserRequest {
 
     @Min(value = 100, message = "Chiều cao phải lớn hơn hoặc bằng 100cm")
     @Max(value = 250, message = "Chiều cao phải nhỏ hơn hoặc bằng 250cm")
-    double height; // Chiều cao (cm)
+    Double height; // Chiều cao (cm)
 
     @Min(value = 40, message = "Cân nặng phải lớn hơn hoặc bằng 40kg")
     @Max(value = 200, message = "Cân nặng phải nhỏ hơn hoặc bằng 200kg")
-    double weight; // Cân nặng (kg)
+    Double weight; // Cân nặng (kg)
 
     @Schema(description = "Ngày hiến máu gần nhất (định dạng yyyy-MM-dd)", example = "2024-06-01")
     @Past(message = "Ngày hiến máu gần nhất phải là ngày trong quá khứ")
