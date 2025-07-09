@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @Builder
 public class BloodRegisterListResponse {
     long id;
+    String fullName;
     LocalDate wantedDate;
     LocalTime wantedHour;
     BloodRegisterStatus status;

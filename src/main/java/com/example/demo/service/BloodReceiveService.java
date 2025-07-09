@@ -45,6 +45,7 @@ public class BloodReceiveService {
         return bloodReceives.stream()
                 .map(bloodReceive -> BloodReceiveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
                         .id(bloodReceive.getId())
+                        .fullName(bloodReceive.getUser().getFullName())// Tên đầy đủ của người dùng
                         .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
                         .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
                         .wantedHour(bloodReceive.getWantedHour())  // Giờ mong muốn
@@ -64,6 +65,7 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
     return bloodReceives.stream()
             .map(bloodReceive -> BloodReceiveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
                     .id(bloodReceive.getId())
+                    .fullName(bloodReceive.getUser().getFullName())// Tên đầy đủ của người dùng
                     .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
                     .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
                     .wantedHour(bloodReceive.getWantedHour())  // Giờ mong muốn
@@ -314,6 +316,7 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         return bloodReceives.stream()
                 .map(bloodReceive -> BloodReceiveListResponse.builder()
                         .id(bloodReceive.getId())
+                        .fullName(bloodReceive.getUser().getFullName())// Tên đầy đủ của người dùng
                         .status(bloodReceive.getStatus())
                         .wantedDate(bloodReceive.getWantedDate())
                         .wantedHour(bloodReceive.getWantedHour())

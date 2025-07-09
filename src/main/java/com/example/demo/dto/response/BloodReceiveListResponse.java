@@ -19,6 +19,7 @@ import java.time.LocalTime;
 @Builder
 public class BloodReceiveListResponse {
     long id;
+    String fullName;
     @Enumerated(EnumType.STRING)
     BloodReceiveStatus status;
     LocalDate wantedDate;
