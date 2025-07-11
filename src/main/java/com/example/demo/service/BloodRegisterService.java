@@ -61,7 +61,7 @@ public class BloodRegisterService {
                         .wantedHour(bloodRegister.getWantedHour())
                         .status(bloodRegister.getStatus())
                         .bloodType(bloodRegister.getUser().getBloodType())
-                        .healthCheckStatus(bloodRegister.getHealthCheck().isStatus())
+                        .healthCheckStatus(bloodRegister.getHealthCheck() != null && bloodRegister.getHealthCheck().isStatus())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -317,14 +317,25 @@ public class BloodRegisterService {
             BloodRegister bloodRegister = bloodRegisterRepository.findById(bloodSetCompletedRequest.getBloodId())
                     .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
 
-            if(bloodRegister.getHealthCheck().isStatus()){
-                //        2. bo vo kho mau
+            // Kiểm tra đã có health check chưa
+            if (bloodRegister.getHealthCheck() == null) {
+                throw new GlobalException("Đơn đăng ký chưa có kiểm tra sức khỏe, không thể hoàn thành");
+            }
+
+            if (bloodRegister.getHealthCheck().isStatus()) {
+                LocalDate checkDate = bloodRegister.getHealthCheck().getCheckDate();
+                LocalDate implementationDate = bloodSetCompletedRequest.getImplementationDate();
+
+                if (implementationDate.isBefore(checkDate)) {
+                    throw new GlobalException("Ngày hiến máu không được trước ngày kiểm tra sức khỏe");
+                }
+                // 2. Bổ sung vào kho máu
                 BloodInventory bloodInventory = new BloodInventory();
                 bloodInventory.setBloodType(bloodRegister.getUser().getBloodType());
                 bloodInventory.setUnitsAvailable(bloodSetCompletedRequest.getUnit());
                 bloodInventoryRepository.save(bloodInventory);
 
-                // 2. Tạo bản ghi máu mới
+                // 3. Tạo bản ghi máu mới
                 Blood blood = Blood.builder()
                         .bloodType(bloodRegister.getUser().getBloodType())
                         .unit(bloodSetCompletedRequest.getUnit())
@@ -335,9 +346,10 @@ public class BloodRegisterService {
                         .build();
                 bloodRepository.save(blood);
 
-                // 3. Cập nhật trạng thái đơn đăng ký
+                // 4. Cập nhật trạng thái đơn đăng ký
                 bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
                 bloodRegisterRepository.save(bloodRegister);
+
                 // 5. Chuyển sang response trả về
                 return BloodRegisterResponse.builder()
                         .emergencyName(bloodRegister.getUser().getEmergencyName())
@@ -357,19 +369,19 @@ public class BloodRegisterService {
                         .wantedHour(bloodRegister.getWantedHour())
                         .unit(bloodSetCompletedRequest.getUnit())
                         .build();
-            }else{
+            } else {
                 bloodRegister.setStatus(BloodRegisterStatus.INCOMPLETED);
                 bloodRegisterRepository.save(bloodRegister);
                 throw new GlobalException("Đơn đăng ký không đủ điều kiện để hoàn thành");
             }
-
-
-        } catch (Exception e) {
+        }catch (GlobalException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
             throw new GlobalException("Đơn đã hoàn thành hoặc không tồn tại");
         }
     }
-
-
 
 
     public List<BloodRegisterGetAllResponse> getListDonation() {

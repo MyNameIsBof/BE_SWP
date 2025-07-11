@@ -44,7 +44,7 @@ public class BloodRegister {
     Blood blood;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "blood_register_id")
+    @JoinColumn(name = "health_check_id")
     HealthCheck healthCheck;
 
 }

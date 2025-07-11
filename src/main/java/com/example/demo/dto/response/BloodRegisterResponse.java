@@ -21,7 +21,6 @@ public class BloodRegisterResponse {
     String email;
     String phone;
     String address;
-    String location;
     Gender gender;
     LocalDate birthdate;
     double height;

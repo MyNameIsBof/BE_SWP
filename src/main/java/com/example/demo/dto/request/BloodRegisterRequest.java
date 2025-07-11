@@ -57,8 +57,8 @@ public class BloodRegisterRequest {
     LocalDate wantedDate;
 
     @NotNull(message = "Giờ mong muốn hiến máu là bắt buộc")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    @Schema(example = "10:30:00", description = "Thời gian yêu cầu hiến máu")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @Schema(type = "string", format = "HH:mm",example = "10:30", description = "Thời gian yêu cầu hiến máu")
     LocalTime wantedHour;
 
     @NotEmpty(message = "Tên người liên hệ khẩn cấp là bắt buộc")
