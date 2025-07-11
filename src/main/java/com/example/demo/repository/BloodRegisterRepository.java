@@ -10,6 +10,5 @@ import java.util.List;
 public interface BloodRegisterRepository extends JpaRepository<BloodRegister, Long> {
     List<BloodRegister> findByStatusIn(List<BloodRegisterStatus> statuses);
     List<BloodRegister> findByUserId(Long userId);
-
     long countByUserIdAndStatus(Long userId, BloodRegisterStatus status);
 }

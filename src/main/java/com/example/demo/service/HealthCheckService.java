@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.HealthCheckRequest;
 import com.example.demo.dto.response.HealthCheckResponse;
+import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.HealthCheck;
 import com.example.demo.entity.User;
@@ -14,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HealthCheckService {
@@ -51,6 +54,7 @@ public class HealthCheckService {
                 .temperature(healthCheckRequest.getTemperature())
                 .bloodPressure(healthCheckRequest.getBloodPressure())
                 .checkDate(LocalDate.now()) // tự động lấy ngày hiện tại
+                .bloodType(bloodRegister.getUser().getBloodType())
                 .staffName(currentUser.getFullName())
                 .fullName(bloodRegister.getUser().getFullName())
                 .medicalHistory(bloodRegister.getUser().getMedicalHistory())
@@ -60,6 +64,9 @@ public class HealthCheckService {
                 .build();
 
         healthCheck = healthCheckRepository.save(healthCheck);
+
+        bloodRegister.setHealthCheck(healthCheck);
+        bloodRegisterRepository.save(bloodRegister);
 
 
         // 5. Trả response có chứa tên người làm đơn và tiền sử bệnh
@@ -91,6 +98,7 @@ public class HealthCheckService {
                 .temperature(healthCheck.getTemperature())
                 .bloodPressure(healthCheck.getBloodPressure())
                 .checkDate(healthCheck.getCheckDate())
+                .bloodType(healthCheck.getBloodType())
                 .staffName(healthCheck.getStaffName())
                 .status(healthCheck.isStatus())
                 .bloodRegisterId(healthCheck.getBloodRegister().getId())
@@ -131,6 +139,7 @@ public class HealthCheckService {
         healthCheck.setStatus(healthCheckRequest.isStatus());
         Optional.ofNullable(healthCheckRequest.getReason()).ifPresent(healthCheck::setReason);
 
+
         healthCheck = healthCheckRepository.save(healthCheck);
 
         return HealthCheckResponse.builder()
@@ -144,8 +153,7 @@ public class HealthCheckService {
                 .checkDate(healthCheck.getCheckDate())
                 .staffName(healthCheck.getStaffName())
                 .status(healthCheck.isStatus())
-                .bloodRegisterId(healthCheck.getBloodRegister().getId())
                 .build();
     }
-
+    
 }

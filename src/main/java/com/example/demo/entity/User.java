@@ -57,6 +57,14 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "recipient", orphanRemoval = true)
     List<Notification> notifications;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "donor", orphanRemoval = true)
+    List<Certificate> certificates;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "staff", orphanRemoval = true)
+    List<Certificate> certificatesIssued;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
