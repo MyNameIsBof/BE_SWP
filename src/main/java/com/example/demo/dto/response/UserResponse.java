@@ -3,6 +3,7 @@ package com.example.demo.dto.response;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Gender;
 import com.example.demo.enums.Role;
+import com.example.demo.enums.UserStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -37,4 +38,6 @@ public class UserResponse {
     Role role;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
+    @Enumerated(EnumType.STRING)
+    UserStatus status;
 }

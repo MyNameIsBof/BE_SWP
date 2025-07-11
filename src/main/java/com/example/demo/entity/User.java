@@ -2,6 +2,7 @@ package com.example.demo.entity;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Gender;
 import com.example.demo.enums.Role;
+import com.example.demo.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +28,6 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
      long id;
      String fullName;
-
     @Column(unique = true)
      String email;
      String password;
@@ -47,6 +47,8 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
      BloodType bloodType;
+    @Enumerated(EnumType.STRING)
+    UserStatus status;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true )
     List<BloodRegister> registers;
