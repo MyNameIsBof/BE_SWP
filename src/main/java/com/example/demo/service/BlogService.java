@@ -1,18 +1,24 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.BlogRatingRequest;
 import com.example.demo.dto.request.BlogRequest;
+import com.example.demo.dto.response.BlogRatingResponse;
 import com.example.demo.dto.response.BlogResponse;
 import com.example.demo.entity.Blog;
+import com.example.demo.entity.BlogRating;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BlogStatus;
+import com.example.demo.exception.exceptions.GlobalException;
+import com.example.demo.mapper.BlogRatingMapper;
+import com.example.demo.repository.AuthenticationRepository;
+import com.example.demo.repository.BlogRatingRepository;
 import com.example.demo.repository.BlogRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,8 +36,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BlogService {
 
-    private final BlogRepository blogRepository;
+    @Autowired
+    private BlogRepository blogRepository;
+    @Autowired
+    private BlogRatingRepository blogRatingRepository;
+    @Autowired
+    private BlogRatingMapper blogRatingMapper;
+    @Autowired
     private final AuthenticationService authenticationService;
+    private final AuthenticationRepository userRepository;
 
     // Lấy tất cả blog còn hoạt động
     public List<BlogResponse> getAllBlogs() {
@@ -151,6 +164,23 @@ public class BlogService {
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi upload ảnh", e);
         }
+    }
+
+    public BlogRatingResponse rateBlog(Long blogId, Long userId, BlogRatingRequest req) {
+        Blog blog = blogRepository.findById(blogId)
+                .orElseThrow(() -> new GlobalException("Không tìm thấy Blog với id: " + blogId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException("Không tìm thấy User với id: " + userId));
+
+        BlogRating blogRating = BlogRating.builder()
+                .blog(blog)
+                .user(user)
+                .rating(req.getRating())
+                .comment(req.getComment())
+                .build();
+
+        BlogRating savedBlogRating = blogRatingRepository.save(blogRating);
+        return blogRatingMapper.toResponse(savedBlogRating);
     }
 
 }

@@ -1,11 +1,14 @@
 package com.example.demo.api;
 
+import com.example.demo.dto.request.BlogRatingRequest;
 import com.example.demo.dto.request.BlogRequest;
+import com.example.demo.dto.response.BlogRatingResponse;
 import com.example.demo.dto.response.BlogResponse;
 import com.example.demo.service.BlogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,5 +78,13 @@ public class BlogAPI {
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         String url = blogService.uploadImage(file);
         return ResponseEntity.ok(url);
+    }
+
+
+    @PostMapping("/{blogId}/ratings")
+    public BlogRatingResponse rateBlog(@PathVariable Long blogId,
+                                       @RequestBody BlogRatingRequest req,
+                                       @RequestParam Long userId) { // hoặc lấy userId từ SecurityContext
+        return blogService.rateBlog(blogId, userId, req);
     }
 }
