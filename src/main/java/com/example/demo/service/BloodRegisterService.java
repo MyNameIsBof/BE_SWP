@@ -7,6 +7,7 @@ import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.dto.response.HistoryResponse;
 import com.example.demo.entity.*;
+import com.example.demo.enums.BloodInventoryStatus;
 import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
@@ -33,7 +34,7 @@ public class BloodRegisterService {
     BloodRegisterMapper bloodRegisterMapper;
 
     @Autowired
-    HealthCheckRepository healthCheckRepository;
+    AuthenticationRepository authenticationRepository;
 
     @Autowired
     AuthenticationService authenticationService;
@@ -69,6 +70,16 @@ public class BloodRegisterService {
     public BloodRegisterResponse create(BloodRegisterRequest bloodRegisterRequest) {
 //        User
         User currentUser = authenticationService.getCurrentUser();
+
+        LocalDate lastDonation = currentUser.getLastDonation();
+        if (lastDonation != null) {
+            LocalDate nextEligibleDate = lastDonation.plusDays(84);
+            if (LocalDate.now().isBefore(nextEligibleDate)) {
+                long remainingDays = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), nextEligibleDate);
+                throw new GlobalException("Bạn chưa đủ thời gian để hiến máu tiếp theo. Vui lòng chờ thêm " + remainingDays + " ngày.");
+            }
+        }
+
         currentUser.setWeight(bloodRegisterRequest.getWeight());
         currentUser.setHeight(bloodRegisterRequest.getHeight());
         currentUser.setBirthdate(bloodRegisterRequest.getBirthdate());
@@ -333,6 +344,7 @@ public class BloodRegisterService {
                 BloodInventory bloodInventory = new BloodInventory();
                 bloodInventory.setBloodType(bloodRegister.getUser().getBloodType());
                 bloodInventory.setUnitsAvailable(bloodSetCompletedRequest.getUnit());
+                bloodInventory.setStatus(BloodInventoryStatus.AVAILABLE);
                 bloodInventoryRepository.save(bloodInventory);
 
                 // 3. Tạo bản ghi máu mới
@@ -349,6 +361,12 @@ public class BloodRegisterService {
                 // 4. Cập nhật trạng thái đơn đăng ký
                 bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
                 bloodRegisterRepository.save(bloodRegister);
+
+                User user = bloodRegister.getUser();
+                user.setLastDonation(bloodSetCompletedRequest.getImplementationDate());
+                authenticationRepository.save(user);
+
+
 
                 // 5. Chuyển sang response trả về
                 return BloodRegisterResponse.builder()
@@ -406,7 +424,7 @@ public class BloodRegisterService {
                     int completedCount = getCompletedCountByUser(user.getId());
 
                     return BloodRegisterGetAllResponse.builder()
-                            .id(user.getId()) // ✅ ID người dùng
+                            .id(user.getId())
                             .fullName(user.getFullName())
                             .email(user.getEmail())
                             .phone(user.getPhone())
