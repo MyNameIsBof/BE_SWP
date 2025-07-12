@@ -6,6 +6,7 @@ import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.HealthCheck;
 import com.example.demo.entity.User;
+import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.HealthCheckStatus;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
@@ -57,11 +58,16 @@ public class HealthCheckService {
                 .bloodType(bloodRegister.getUser().getBloodType())
                 .staffName(currentUser.getFullName())
                 .fullName(bloodRegister.getUser().getFullName())
+                .bloodType(bloodRegister.getUser().getBloodType())
                 .medicalHistory(bloodRegister.getUser().getMedicalHistory())
                 .status(healthCheckRequest.isStatus())
                 .reason(healthCheckRequest.getReason())
                 .bloodRegister(bloodRegister)
                 .build();
+
+        if (!healthCheckRequest.isStatus()) {
+            bloodRegister.setStatus(BloodRegisterStatus.REJECTED);
+        }
 
         healthCheck = healthCheckRepository.save(healthCheck);
 
@@ -78,6 +84,7 @@ public class HealthCheckService {
                 .weight(healthCheck.getWeight())
                 .temperature(healthCheck.getTemperature())
                 .bloodPressure(healthCheck.getBloodPressure())
+                .bloodType(bloodRegister.getUser().getBloodType())
                 .checkDate(healthCheck.getCheckDate())
                 .staffName(healthCheck.getStaffName())
                 .status(healthCheck.isStatus())
@@ -155,5 +162,5 @@ public class HealthCheckService {
                 .status(healthCheck.isStatus())
                 .build();
     }
-    
+
 }

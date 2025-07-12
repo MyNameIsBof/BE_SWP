@@ -3,15 +3,12 @@ package com.example.demo.api;
 
 
 import com.example.demo.dto.request.*;
-import com.example.demo.dto.response.EmailPasswordResponse;
+import com.example.demo.dto.response.*;
 
 import com.example.demo.dto.request.ForgotPasswordRequest;
 import com.example.demo.dto.request.ResetPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
-import com.example.demo.dto.response.CheckDonationAbilityResponse;
 
-import com.example.demo.dto.response.OTPResponse;
-import com.example.demo.dto.response.UserResponse;
 import com.example.demo.service.PasswordResetService;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,7 +69,11 @@ public class UserAPI {
         return ResponseEntity.ok("Cập nhật trạng thái người dùng thành công");
     }
 
-
+    @GetMapping("/get-remind")
+    @Operation(summary = "Lấy thông báo nhắc nhở")
+    public ResponseEntity<RemindResponse> getRemind() {
+        return ResponseEntity.ok(updateUserService.getDonationReminder());
+    }
 
     @GetMapping("/check-donation-ability")
     @Operation(summary = "")

@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.request.UpdateStatusRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.CheckDonationAbilityResponse;
+import com.example.demo.dto.response.RemindResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
@@ -122,5 +123,23 @@ public class UserService {
         authenticationRepository.save(userToUpdate);
     }
 
+    public RemindResponse getDonationReminder() {
+        User currentUser = authenticationService.getCurrentUser();
+        LocalDate lastDonation = currentUser.getLastDonation();
+
+        if (lastDonation == null) {
+            return new RemindResponse("Bạn chưa từng hiến máu. Bạn có thể đăng ký hiến máu bất kỳ lúc nào!");
+        }
+
+        LocalDate nextEligibleDate = lastDonation.plusDays(84);
+        LocalDate today = LocalDate.now();
+
+        if (!today.isBefore(nextEligibleDate)) {
+            return new RemindResponse("Bạn đã đủ điều kiện hiến máu lần tiếp theo. Hãy đăng ký ngay!");
+        } else {
+            long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(today, nextEligibleDate);
+            return new RemindResponse("Bạn cần chờ thêm " + daysRemaining + " ngày nữa để đủ điều kiện hiến máu tiếp theo.");
+        }
+    }
 }
 
