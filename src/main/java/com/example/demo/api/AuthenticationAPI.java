@@ -51,7 +51,7 @@ public class AuthenticationAPI {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/set-role")
+    @PutMapping("/set-role")
     @Operation(summary = "Cập nhật vai trò của người dùng")
     public ResponseEntity<?> setRole(@RequestParam String email, @RequestParam Role role) {
         return ResponseEntity.ok(authenticationService.setRole(email, role));

@@ -7,6 +7,7 @@ import com.example.demo.dto.response.RemindResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
+import com.example.demo.enums.UserStatus;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.repository.AuthenticationRepository;
@@ -86,6 +87,7 @@ public class UserService {
                 .emergencyName(user.getEmergencyName())
                 .emergencyPhone(user.getEmergencyPhone())
                 .role(user.getRole())
+                .status(user.getStatus())
                 .bloodType(user.getBloodType())
                 .build()).toList();
     }
@@ -113,9 +115,11 @@ public class UserService {
     }
 
     public void updateUserStatus(UpdateStatusRequest request) {
-        User currentUser = authenticationService.getCurrentUser();
-        if (currentUser == null || !currentUser.getRole().equals(Role.ADMIN)) {
-            throw new AuthenticationException("Bạn không có quyền cập nhật trạng thái người dùng");
+        if (request.getStatus() != UserStatus.ACTIVE) {
+            User currentUser = authenticationService.getCurrentUser();
+            if (currentUser == null || !currentUser.getRole().equals(Role.ADMIN)) {
+                throw new AuthenticationException("Bạn không có quyền cập nhật trạng thái người dùng");
+            }
         }
         User userToUpdate = authenticationRepository.findById(request.getUserId())
                 .orElseThrow(() -> new GlobalException("Người dùng không tồn tại"));

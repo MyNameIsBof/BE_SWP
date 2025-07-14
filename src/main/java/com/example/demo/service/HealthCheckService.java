@@ -163,4 +163,26 @@ public class HealthCheckService {
                 .build();
     }
 
+    public List<HealthCheckResponse> getListHealthChecks() {
+        List<HealthCheck> healthChecks = healthCheckRepository.findAll();
+
+        return healthChecks.stream()
+                .filter(healthCheck -> healthCheck.getBloodRegister() != null)
+                .map(healthCheck -> HealthCheckResponse.builder()
+                        .id(healthCheck.getId())
+                        .fullName(healthCheck.getFullName())
+                        .bloodType(healthCheck.getBloodType())
+                        .medicalHistory(healthCheck.getMedicalHistory())
+                        .height(healthCheck.getHeight())
+                        .weight(healthCheck.getWeight())
+                        .temperature(healthCheck.getTemperature())
+                        .bloodPressure(healthCheck.getBloodPressure())
+                        .checkDate(healthCheck.getCheckDate())
+                        .staffName(healthCheck.getStaffName())
+                        .status(healthCheck.isStatus())
+                        .bloodRegisterId(healthCheck.getBloodRegister().getId())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }
