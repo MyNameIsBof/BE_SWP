@@ -135,34 +135,18 @@ public class BloodRegisterService {
             if (!bloodRegister.getUser().getEmail().equals(currentUser.getEmail())) {
                 throw new AuthenticationException("Bạn không có quyền cập nhật đơn đăng ký này");
             }
-
-            // Update user fields
-            currentUser.setWeight(bloodRegisterRequest.getWeight());
-            currentUser.setHeight(bloodRegisterRequest.getHeight());
-            currentUser.setBirthdate(bloodRegisterRequest.getBirthdate());
-            currentUser.setGender(bloodRegisterRequest.getGender());
-            currentUser.setLastDonation(bloodRegisterRequest.getLastDonation());
-            currentUser.setMedicalHistory(bloodRegisterRequest.getMedicalHistory());
-            currentUser.setEmergencyName(bloodRegisterRequest.getEmergencyName());
-            currentUser.setEmergencyPhone(bloodRegisterRequest.getEmergencyPhone());
-
-
+            // Chỉ update ngày và giờ mong muốn
             bloodRegister.setWantedDate(bloodRegisterRequest.getWantedDate());
             bloodRegister.setWantedHour(bloodRegisterRequest.getWantedHour());
-            bloodRegister.setStatus(BloodRegisterStatus.PENDING);
-            bloodRegister.setUser(currentUser);
-
-
             bloodRegisterRepository.save(bloodRegister);
-
-            // Prepare the response with updated fields
+            // Chuẩn bị response với dữ liệu mới cập nhật
             BloodRegisterResponse bloodRegisterResponse = BloodRegisterResponse.builder()
-                    .emergencyName(bloodRegisterRequest.getEmergencyName())
-                    .emergencyPhone(bloodRegisterRequest.getEmergencyPhone())
-                    .wantedDate(bloodRegisterRequest.getWantedDate())
-                    .weight(bloodRegisterRequest.getWeight())
-                    .height(bloodRegisterRequest.getHeight())
-                    .birthdate(bloodRegisterRequest.getBirthdate())
+                    .emergencyName(bloodRegister.getUser().getEmergencyName())
+                    .emergencyPhone(bloodRegister.getUser().getEmergencyPhone())
+                    .wantedDate(bloodRegister.getWantedDate())
+                    .weight(bloodRegister.getUser().getWeight())
+                    .height(bloodRegister.getUser().getHeight())
+                    .birthdate(bloodRegister.getUser().getBirthdate())
                     .email(bloodRegister.getUser().getEmail())
                     .fullName(bloodRegister.getUser().getFullName())
                     .phone(bloodRegister.getUser().getPhone())
@@ -171,12 +155,11 @@ public class BloodRegisterService {
                     .lastDonation(bloodRegister.getUser().getLastDonation())
                     .medicalHistory(bloodRegister.getUser().getMedicalHistory())
                     .bloodType(bloodRegister.getUser().getBloodType())
-                    .wantedHour(bloodRegisterRequest.getWantedHour())
+                    .wantedHour(bloodRegister.getWantedHour())
                     .build();
 
             return bloodRegisterResponse;
         } else {
-            // If the status is not PENDING, throw an exception
             throw new AuthenticationException("Đơn đã được duyệt hoặc không tồn tại");
         }
     }

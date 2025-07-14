@@ -213,7 +213,7 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         bloodReceiveRepository.save(bloodReceive);
     }
 
-    public BloodReceiveResponse getById(Long id) {
+    public BloodReceiveResponse getByUserId(Long id) {
         User currentUser = authenticationService.getCurrentUser();
         if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền xem thông tin đơn yêu cầu này");
@@ -250,10 +250,20 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
     @Transactional
     public BloodReceiveResponse setCompleted(BloodSetCompletedRequest request) {
         User currentUser = authenticationService.getCurrentUser();
-        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền lấy máu cho người nhận");
         }
-        BloodType neededType = currentUser.getBloodType();
+
+        // Lấy đơn yêu cầu nhận máu trước
+        BloodReceive receive = bloodReceiveRepository.findById(request.getBloodId())
+                .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
+        // Kiểm tra trạng thái đơn để tránh xử lý lại nhiều lần
+        if (receive.getStatus() == BloodReceiveStatus.COMPLETED) {
+            throw new GlobalException("Đơn nhận máu này đã hoàn thành.");
+        }
+
+        // Lấy nhóm máu của người nhận
+        BloodType neededType = receive.getUser().getBloodType();
         float requiredUnits = request.getUnit();
 
         // Lấy danh sách nhóm máu tương thích với người nhận
@@ -292,38 +302,15 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         bloodInventoryRepository.saveAll(usedInventories);
 
         // Đánh dấu đơn yêu cầu nhận máu là hoàn tất
-        BloodReceive receive = bloodReceiveRepository.findById(request.getBloodId())
-                .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
         receive.setStatus(BloodReceiveStatus.COMPLETED);
         bloodReceiveRepository.save(receive);
 
         // Create notification for completed blood receive
         String completionMessage = "Blood transfusion completed successfully. " +
-                                 "Blood type: " + receive.getUser().getBloodType() +
-                                 ", Units received: " + requiredUnits;
+                "Blood type: " + receive.getUser().getBloodType() +
+                ", Units received: " + requiredUnits;
         notificationService.createDonationCompletedNotification(receive.getUser(), completionMessage);
 
         return createResponseFromUserAndReceive(currentUser, receive);
-    }
-
-    public List<BloodReceiveListResponse> getByUserId(Long userId) {
-        List<BloodReceive> bloodReceives = bloodReceiveRepository.findByUserId(userId);
-
-        if (bloodReceives.isEmpty()) {
-            throw new GlobalException("Không tìm thấy đơn nhận máu nào cho người dùng này");
-        }
-
-        return bloodReceives.stream()
-                .map(bloodReceive -> BloodReceiveListResponse.builder()
-                        .id(bloodReceive.getId())
-                        .fullName(bloodReceive.getUser().getFullName())
-                        .status(bloodReceive.getStatus())
-                        .wantedDate(bloodReceive.getWantedDate())
-                        .wantedHour(bloodReceive.getWantedHour())
-                        .status(bloodReceive.getStatus())
-                        .bloodType(bloodReceive.getUser().getBloodType())
-                        .isEmergency(bloodReceive.isEmergency())
-                        .build()
-                ).collect(Collectors.toList());
     }
 }

@@ -54,7 +54,7 @@ public class BloodReceiveAPI {
     @GetMapping("/get/{id}")
     @Operation(summary = "Lấy thông tin yêu cầu nhận máu theo ID")
     public ResponseEntity<BloodReceiveResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(bloodReceiveService.getById(id));
+        return ResponseEntity.ok(bloodReceiveService.getByUserId(id));
     }
 
     @PatchMapping("/update-status/{id}")
@@ -71,10 +71,10 @@ public class BloodReceiveAPI {
         return ResponseEntity.ok(bloodReceiveService.setCompleted(bloodSetCompletedRequest));
     }
 
-    @GetMapping("/get-blood-receive-by-user-id")
-    @Operation(summary = "Lấy danh sách yêu cầu nhận máu theo ID người dùng")
-    public ResponseEntity<List<BloodReceiveListResponse>> getBloodReceiveByUserId(@RequestParam Long userId) {
-        List<BloodReceiveListResponse> result = bloodReceiveService.getByUserId(userId);
-        return ResponseEntity.ok(result);
-    }
+//    @GetMapping("/get-blood-receive-by-user-id")
+//    @Operation(summary = "Lấy danh sách yêu cầu nhận máu theo ID người dùng")
+//    public ResponseEntity<List<BloodReceiveListResponse>> getBloodReceiveByUserId(@RequestParam Long userId) {
+//        List<BloodReceiveListResponse> result = bloodReceiveService.getByUserId(userId);
+//        rnbeturn ResponseEntity.ok(result);
+//    }
 }
