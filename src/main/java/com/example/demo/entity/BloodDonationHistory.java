@@ -6,9 +6,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -17,7 +14,7 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-public class Blood {
+public class BloodDonationHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
@@ -26,6 +23,7 @@ public class Blood {
     BloodType bloodType;
 
     float unit;
+
     @Temporal(TemporalType.DATE)
     LocalDate expirationDate;
     LocalDate donationDate;

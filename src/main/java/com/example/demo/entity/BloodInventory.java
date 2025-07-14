@@ -25,7 +25,7 @@ public class BloodInventory {
     float unitsAvailable;
 
     @OneToOne(mappedBy = "bloodInventory")
-    Blood bloods;
+    BloodDonationHistory bloods;
 
     @Enumerated(EnumType.STRING)
     BloodInventoryStatus status;

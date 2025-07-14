@@ -1,7 +1,6 @@
 package com.example.demo.entity;
 
 import com.example.demo.enums.BloodRegisterStatus;
-import com.example.demo.enums.HealthCheckStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -41,7 +39,7 @@ public class BloodRegister {
     User user;
 
     @OneToOne(mappedBy = "bloodRegister",cascade = CascadeType.ALL)
-    Blood blood;
+    BloodDonationHistory bloodDonationHistory;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "health_check_id")

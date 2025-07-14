@@ -1,11 +1,7 @@
 package com.example.demo.dto.response;
 
-import com.example.demo.entity.Blood;
 import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.BloodType;
-import com.example.demo.enums.HealthCheckStatus;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

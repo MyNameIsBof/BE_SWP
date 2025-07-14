@@ -272,9 +272,9 @@ public class BloodRegisterService {
         return bloodRegisters.stream()
                 .filter(bloodRegister -> bloodRegister.getStatus() == BloodRegisterStatus.COMPLETED)
                 .map(bloodRegister -> {
-                    Optional<Blood> bloodOpt = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
-                    float unit = bloodOpt.map(Blood::getUnit).orElse(0f);
-                    LocalDate completedDate = bloodOpt.map(Blood::getDonationDate).orElse(null);
+                    Optional<BloodDonationHistory> bloodOpt = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
+                    float unit = bloodOpt.map(BloodDonationHistory::getUnit).orElse(0f);
+                    LocalDate completedDate = bloodOpt.map(BloodDonationHistory::getDonationDate).orElse(null);
 
                     return HistoryResponse.builder()
                             .id(bloodRegister.getUser().getId())
@@ -298,7 +298,7 @@ public class BloodRegisterService {
                 .map(bloodRegister -> {
                     float unit = 0;
                     if (bloodRegister.getStatus() == BloodRegisterStatus.COMPLETED) {
-                        Optional<Blood> blood = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
+                        Optional<BloodDonationHistory> blood = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
                         if (blood.isPresent()) {
                             unit = blood.get().getUnit();
                         }
@@ -348,7 +348,7 @@ public class BloodRegisterService {
                 bloodInventoryRepository.save(bloodInventory);
 
                 // 3. Tạo bản ghi máu mới
-                Blood blood = Blood.builder()
+                BloodDonationHistory bloodDonationHistory = BloodDonationHistory.builder()
                         .bloodType(bloodRegister.getUser().getBloodType())
                         .unit(bloodSetCompletedRequest.getUnit())
                         .expirationDate(bloodSetCompletedRequest.getImplementationDate().plusDays(50))
@@ -356,7 +356,7 @@ public class BloodRegisterService {
                         .bloodRegister(bloodRegister)
                         .bloodInventory(bloodInventory)
                         .build();
-                bloodRepository.save(blood);
+                bloodRepository.save(bloodDonationHistory);
 
                 // 4. Cập nhật trạng thái đơn đăng ký
                 bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);

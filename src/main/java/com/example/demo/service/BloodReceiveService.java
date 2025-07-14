@@ -5,10 +5,7 @@ import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
 import com.example.demo.dto.response.BloodReceiveListResponse;
 import com.example.demo.dto.response.BloodRegisterListResponse;
-import com.example.demo.entity.BloodInventory;
-import com.example.demo.entity.BloodReceive;
-import com.example.demo.entity.BloodRegister;
-import com.example.demo.entity.User;
+import com.example.demo.entity.*;
 import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
@@ -16,9 +13,11 @@ import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.mapper.BloodReceiveMapper;
 import com.example.demo.repository.BloodInventoryRepository;
+import com.example.demo.repository.BloodReceiveHistoryRepository;
 import com.example.demo.repository.BloodReceiveRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,6 +33,9 @@ public class BloodReceiveService {
     private final AuthenticationService authenticationService;
     private final BloodInventoryRepository bloodInventoryRepository;
     private final NotificationService notificationService;
+
+    @Autowired
+    BloodReceiveHistoryRepository bloodReceiveHistoryRepository;
 
 
     public List<BloodReceiveListResponse> getAll() {
@@ -256,6 +258,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         BloodType neededType = currentUser.getBloodType();
         float requiredUnits = request.getUnit();
 
+        BloodReceive bloodReceive = bloodReceiveRepository.findById(request.getBloodId())
+                .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
+
         // Lấy danh sách nhóm máu tương thích với người nhận
         List<BloodType> compatibleTypes = BloodType.CompatibleBloodMap.get(neededType);
         if (compatibleTypes == null || compatibleTypes.isEmpty()) {
@@ -302,6 +307,18 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                                  "Blood type: " + receive.getUser().getBloodType() +
                                  ", Units received: " + requiredUnits;
         notificationService.createDonationCompletedNotification(receive.getUser(), completionMessage);
+
+        BloodReceiveHistory bloodReceiveHistory = BloodReceiveHistory.builder()
+                .bloodType(receive.getUser().getBloodType())
+                .unit(requiredUnits)
+                .receiveDate(request.getImplementationDate())
+                .bloodReceive(receive)
+                .build();
+        bloodReceiveHistoryRepository.save(bloodReceiveHistory);
+
+        for (BloodInventory inv : inventories) {
+            System.out.println("Found inventory: " + inv.getBloodType() + " - available: " + inv.getUnitsAvailable());
+        }
 
         return createResponseFromUserAndReceive(currentUser, receive);
     }
