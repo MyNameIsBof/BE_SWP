@@ -94,7 +94,7 @@ public class EmailService {
 
 
 
-            String html = templateEngine.process("welcomeEmailTemplate", context);
+            String html = templateEngine.process("welcomeEmailtemplate", context);
 
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);

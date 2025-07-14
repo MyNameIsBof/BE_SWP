@@ -35,4 +35,7 @@ public class BloodReceive {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     User user;
+
+    @OneToOne(mappedBy = "bloodReceive",cascade = CascadeType.ALL)
+    BloodReceiveHistory bloodReceiveHistory;
 }

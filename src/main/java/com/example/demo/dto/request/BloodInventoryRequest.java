@@ -1,18 +1,11 @@
 package com.example.demo.dto.request;
 
-import com.example.demo.entity.Blood;
 import com.example.demo.enums.BloodInventoryStatus;
 import com.example.demo.enums.BloodType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor

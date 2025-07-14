@@ -2,12 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.HealthCheckRequest;
 import com.example.demo.dto.response.HealthCheckResponse;
-import com.example.demo.entity.Blood;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.HealthCheck;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodRegisterStatus;
-import com.example.demo.enums.HealthCheckStatus;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.repository.BloodRegisterRepository;

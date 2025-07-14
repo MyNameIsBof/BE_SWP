@@ -1,7 +1,7 @@
 # Notification System Documentation
 
 ## Overview
-This document describes the comprehensive notification system implemented for the blood donation application.
+This document describes the comprehensive notification system implemented for the bloodDonationHistory donation application.
 
 ## Components
 
@@ -51,8 +51,8 @@ This document describes the comprehensive notification system implemented for th
 - Automatic notification when BloodRegister is created
 
 ### Donation Completion
-- Automatic notification when blood donation/receive is completed
-- Includes details about units and blood type
+- Automatic notification when bloodDonationHistory donation/receive is completed
+- Includes details about units and bloodDonationHistory type
 
 ### Status Change Notifications
 - Automatic notifications when BloodReceive status changes (APPROVED, REJECTED, COMPLETED, INCOMPLETED, CANCELED)
@@ -88,4 +88,4 @@ List<NotificationResponse> notifications = notificationService.getNotificationsB
 UnreadCountResponse count = notificationService.getUnreadCount(user);
 ```
 
-This notification system ensures users are kept informed about blood donation activities, emergency requests, and donation completions in real-time.
+This notification system ensures users are kept informed about bloodDonationHistory donation activities, emergency requests, and donation completions in real-time.
