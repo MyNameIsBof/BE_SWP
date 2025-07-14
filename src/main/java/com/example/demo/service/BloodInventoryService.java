@@ -2,11 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
-import com.example.demo.entity.Blood;
+import com.example.demo.entity.BloodDonationHistory;
 import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodInventoryStatus;
-import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.exception.exceptions.ResourceNotFoundException;
@@ -18,7 +17,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -149,16 +147,16 @@ public class BloodInventoryService {
         try {
             LocalDate today = LocalDate.now();
             // Danh sách máu hết hạn
-            List<Blood> expiredBloodList = bloodRepository.findByExpirationDateBefore(today);
+            List<BloodDonationHistory> expiredBloodDonationHistoryList = bloodRepository.findByExpirationDateBefore(today);
 
-            for (Blood expiredBlood : expiredBloodList) {
-                BloodInventory inventory = expiredBlood.getBloodInventory();
+            for (BloodDonationHistory expiredBloodDonationHistory : expiredBloodDonationHistoryList) {
+                BloodInventory inventory = expiredBloodDonationHistory.getBloodInventory();
                 inventory.setUnitsAvailable(0);
                 bloodInventoryRepository.save(inventory);
             }
 
             bloodInventoryRepository.saveAll(
-                    expiredBloodList.stream().map(Blood::getBloodInventory).distinct().toList()
+                    expiredBloodDonationHistoryList.stream().map(BloodDonationHistory::getBloodInventory).distinct().toList()
             );
         } catch (Exception e) {
             throw new GlobalException("Lỗi khi cập nhật máu hết hạn");
