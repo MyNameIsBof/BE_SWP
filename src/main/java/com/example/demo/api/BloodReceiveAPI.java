@@ -70,11 +70,4 @@ public class BloodReceiveAPI {
     public ResponseEntity<BloodReceiveResponse> setCompleted(@RequestBody BloodSetCompletedRequest bloodSetCompletedRequest) {
         return ResponseEntity.ok(bloodReceiveService.setCompleted(bloodSetCompletedRequest));
     }
-
-//    @GetMapping("/get-blood-receive-by-user-id")
-//    @Operation(summary = "Lấy danh sách yêu cầu nhận máu theo ID người dùng")
-//    public ResponseEntity<List<BloodReceiveListResponse>> getBloodReceiveByUserId(@RequestParam Long userId) {
-//        List<BloodReceiveListResponse> result = bloodReceiveService.getByUserId(userId);
-//        rnbeturn ResponseEntity.ok(result);
-//    }
 }

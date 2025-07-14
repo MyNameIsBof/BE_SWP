@@ -14,14 +14,13 @@ public class GlobalException extends RuntimeException {
         super(message);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    @ExceptionHandler(GlobalException.class)
+    public ResponseEntity<Object> handleGlobalException(GlobalException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -30,7 +29,6 @@ public class GlobalException extends RuntimeException {
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
         body.put("status", HttpStatus.NOT_FOUND.value());
-
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
@@ -40,7 +38,6 @@ public class GlobalException extends RuntimeException {
         body.put("timestamp", LocalDateTime.now());
         body.put("message", "An unexpected error occurred: " + ex.getMessage());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -87,4 +87,10 @@ public class BlogAPI {
                                        @RequestParam Long userId) { // hoặc lấy userId từ SecurityContext
         return blogService.rateBlog(blogId, userId, req);
     }
+
+    @GetMapping("/author/{author}")
+    @Operation(summary = "Lấy danh sách blog theo tên tác giả")
+    public ResponseEntity<List<BlogResponse>> getBlogsByAuthor(@PathVariable String author) {
+        return ResponseEntity.ok(blogService.getBlogsByAuthor(author));
+    }
 }
