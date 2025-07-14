@@ -9,14 +9,19 @@ import com.example.demo.dto.request.ForgotPasswordRequest;
 import com.example.demo.dto.request.ResetPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
 
+import com.example.demo.entity.User;
+import com.example.demo.enums.UserStatus;
+import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.service.PasswordResetService;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,8 +31,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserAPI {
 
+    @Autowired
+    private final AuthenticationRepository authenticationRepository;
+
+    @Autowired
     private final PasswordResetService passwordResetService;
+
+    @Autowired
     private final UserService updateUserService;
+
     @PutMapping("update-user")
     @Operation(summary = "Cập nhật thông tin người dùng")
     public ResponseEntity<UserResponse> update(@RequestBody UserRequest userRequest) {

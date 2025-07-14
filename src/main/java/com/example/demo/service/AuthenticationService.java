@@ -41,21 +41,22 @@ public class AuthenticationService implements UserDetailsService {
     UserMapper userMapper;
 
     @Autowired
-    BloodTypeRepository bloodTypeRepository;
+    EmailService emailService;
 
     public RegisterResponse register(RegisterRequest request){
         try{
-            System.out.println(request.getPassword());
             String password = passwordEncoder.encode(request.getPassword());
             User newUser = userMapper.toUser(request);
             newUser.setRole(Role.MEMBER);
-            newUser.setStatus(UserStatus.ACTIVE);
+            newUser.setStatus(UserStatus.INACTIVE);
             newUser.setPassword(password);
             newUser.setBloodType(request.getBloodType());
             RegisterResponse response = RegisterResponse.builder()
                     .email(newUser.getEmail())
                     .build();
             authenticationRepository.save(newUser);
+
+            emailService.sendWelcomeMail(newUser.getEmail(), "Chào mừng bạn đến với hệ thống hỗ trợ hiến máu");
 
             return response;
         } catch (Exception e){

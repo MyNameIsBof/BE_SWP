@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.EmailDetail;
 import com.example.demo.entity.User;
 import com.example.demo.repository.AuthenticationRepository;
 import jakarta.mail.internet.MimeMessage;
@@ -78,6 +77,34 @@ public class EmailService {
             javaMailSender.send(mimeMessage);
 
         } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void sendWelcomeMail(String to, String subject) {
+        try {
+            User currentUser = authenticationRepository.findUserByEmail(to);
+            if (currentUser == null) throw new RuntimeException("Email không tồn tại");
+
+            Context context = new Context();
+            context.setVariable("name", currentUser.getFullName());
+            context.setVariable("email", currentUser.getEmail());
+//            context.setVariable("link", "http://172.20.10.11:8080/api/user/activate?email=" + currentUser.getEmail());
+            context.setVariable("link", "http://14.225.205.143:8080/api/user/activate?email=" + currentUser.getEmail());
+
+
+
+            String html = templateEngine.process("welcomeEmailTemplate", context);
+
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
+
+            mimeMessageHelper.setFrom("admin@gmail.com");
+            mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setText(html, true);
+            mimeMessageHelper.setSubject(subject);
+            javaMailSender.send(mimeMessage);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }

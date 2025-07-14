@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/health-check")
 @CrossOrigin("*")
@@ -39,5 +41,11 @@ public class HealthCheckAPI {
     public ResponseEntity<HealthCheckResponse> getById(@PathVariable Long id) {
         HealthCheckResponse response = healthCheckService.getHealthCheckById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("get-list")
+    @Operation(summary = "Lấy danh sách kiểm tra sức khỏe")
+    public ResponseEntity<List<HealthCheckResponse>> getListHealthCheck() {
+        return ResponseEntity.ok(healthCheckService.getListHealthChecks());
     }
 }
