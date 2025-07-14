@@ -25,7 +25,7 @@ public class BlogAPI {
 
     private final BlogService blogService;
 
-    @GetMapping
+    @GetMapping("/get-all")
     public ResponseEntity<List<BlogResponse>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
