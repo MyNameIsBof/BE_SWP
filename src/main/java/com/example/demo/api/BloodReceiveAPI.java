@@ -55,7 +55,7 @@ public class BloodReceiveAPI {
     @GetMapping("/get/{id}")
     @Operation(summary = "Lấy thông tin yêu cầu nhận máu theo ID")
     public ResponseEntity<BloodReceiveResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(bloodReceiveService.getById(id));
+        return ResponseEntity.ok(bloodReceiveService.getByUserId(id));
     }
 
     @PatchMapping("/update-status/{id}")
