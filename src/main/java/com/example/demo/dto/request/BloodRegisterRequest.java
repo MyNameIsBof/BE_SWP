@@ -32,15 +32,15 @@ public class BloodRegisterRequest {
     LocalDate birthdate;
 
     @Positive(message = "Chiều cao phải là số dương")
-    @Schema(example = "175.5", description = "Chiều cao bệnh nhân tính bằng cm")
+    @Schema(example = "175", description = "Chiều cao bệnh nhân tính bằng cm")
     double height;
 
     @Positive(message = "Cân nặng phải là số dương")
-    @Schema(example = "70.2", description = "Cân nặng bệnh nhân tính bằng kg")
+    @Schema(example = "70", description = "Cân nặng bệnh nhân tính bằng kg")
     double weight;
 
     @Past(message = "Ngày hiến máu gần nhất phải trong quá khứ")
-    @Schema(example = "2023-10-05", description = "Ngày hiến máu gần nhất")
+    @Schema(example = "2025-10-05", description = "Ngày hiến máu gần nhất")
     LocalDate lastDonation;
 
     @Schema(example = "Không có", description = "Ghi chú lịch sử y tế của bệnh nhân")
@@ -53,7 +53,7 @@ public class BloodRegisterRequest {
 
     @NotNull(message = "Ngày mong muốn hiến máu là bắt buộc")
     @FutureOrPresent(message = "Ngày mong muốn hiến máu phải là hiện tại hoặc trong tương lai")
-    @Schema(example = "2023-12-20", description = "Ngày yêu cầu hiến máu")
+    @Schema(example = "2025-12-20", description = "Ngày yêu cầu hiến máu")
     LocalDate wantedDate;
 
     @NotNull(message = "Giờ mong muốn hiến máu là bắt buộc")

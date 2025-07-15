@@ -2,10 +2,10 @@ package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodRegisterRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
-import com.example.demo.dto.response.BloodRegisterGetAllResponse;
+import com.example.demo.dto.response.BloodRegisterHistoryResponse;
 import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
-import com.example.demo.dto.response.HistoryResponse;
+import com.example.demo.dto.response.DonationHistoryResponse;
 import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.service.BloodRegisterService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,15 +72,15 @@ public class BloodRegisterAPI {
 
     @GetMapping("/history/{userId}")
     @Operation(summary = "Lấy lịch sử hiến máu của người dùng theo ID")
-    public ResponseEntity<List<HistoryResponse>> getHistoryByUserId(@PathVariable Long userId) {
-        List<HistoryResponse> result = bloodRegisterService.getHistoryByUserId(userId);
+    public ResponseEntity<List<DonationHistoryResponse>> getHistoryByUserId(@PathVariable Long userId) {
+        List<DonationHistoryResponse> result = bloodRegisterService.getHistoryByUserId(userId);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/get-list-donation")
     @Operation(summary = "Lấy danh sách đơn hiến máu đã hoàn thành")
-    public ResponseEntity<List<BloodRegisterGetAllResponse>> getListDonation() {
-        List<BloodRegisterGetAllResponse> result = bloodRegisterService.getListDonation();
+    public ResponseEntity<List<BloodRegisterHistoryResponse>> getListDonation() {
+        List<BloodRegisterHistoryResponse> result = bloodRegisterService.getListDonation();
         return ResponseEntity.ok(result);
     }
 

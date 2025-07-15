@@ -6,6 +6,7 @@ import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.HealthCheck;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.enums.Gender;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.repository.BloodRegisterRepository;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +39,8 @@ public class HealthCheckService {
         // 2. Tìm đơn hiến máu
         BloodRegister bloodRegister = bloodRegisterRepository.findById(healthCheckRequest.getBloodRegisterId())
                 .orElseThrow(() -> new GlobalException("Đơn đăng ký hiến máu không tồn tại"));
+
+        validateHealthCheckInput(healthCheckRequest, bloodRegister.getUser());
 
         // 3. Lấy user từ đơn đăng ký
         User user = bloodRegister.getUser();
@@ -118,6 +122,10 @@ public class HealthCheckService {
         if (!currentUser.getRole().equals(Role.STAFF)) {
             throw new GlobalException("Chỉ nhân viên mới có thể cập nhật thông tin kiểm tra sức khỏe");
         }
+        BloodRegister bloodRegister = bloodRegisterRepository.findById(healthCheckRequest.getBloodRegisterId())
+                .orElseThrow(() -> new GlobalException("Đơn đăng ký hiến máu không tồn tại"));
+
+        validateHealthCheckInput(healthCheckRequest, bloodRegister.getUser());
 
         // Kiểm tra nếu status là false thì phải có lý do
         if (!healthCheckRequest.isStatus() &&
@@ -182,5 +190,50 @@ public class HealthCheckService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    private void validateHealthCheckInput(HealthCheckRequest request, User user) {
+        int age = Period.between(user.getBirthdate(), LocalDate.now()).getYears();
+        if (age < 18 || age > 60) {
+            throw new GlobalException("Người hiến máu phải từ 18 đến 60 tuổi.");
+        }
+
+        if (user.getGender().equals(Gender.MALE) && request.getWeight() < 45) {
+            throw new GlobalException("Nam phải ≥ 45kg để hiến máu.");
+        }
+
+        if (user.getGender().equals(Gender.FEMALE) && request.getWeight() < 42) {
+            throw new GlobalException("Nữ phải ≥ 42kg để hiến máu.");
+        }
+
+        if (request.getTemperature() < 36 || request.getTemperature() > 37.5) {
+            throw new GlobalException("Nhiệt độ cơ thể không hợp lệ.");
+        }
+
+        if (!isBloodPressureNormal(request.getBloodPressure())) {
+            throw new GlobalException("Huyết áp không nằm trong giới hạn cho phép.");
+        }
+
+        if (user.getMedicalHistory() != null && containsProhibitedDisease(user.getMedicalHistory())) {
+            throw new GlobalException("Tiền sử bệnh không đủ điều kiện hiến máu.");
+        }
+    }
+
+    private boolean isBloodPressureNormal(Double bloodPressure) {
+        // Giả sử bạn lưu huyết áp là 12080 (tức là 120/80)
+        int systolic = (int)(bloodPressure / 100);     // Tâm thu
+        int diastolic = (int)(bloodPressure % 100);    // Tâm trương
+        return systolic >= 90 && systolic <= 140 && diastolic >= 60 && diastolic <= 90;
+    }
+
+    private boolean containsProhibitedDisease(String history) {
+        String[] prohibited = {"viêm gan", "HIV", "AIDS", "ung thư", "tim mạch"};
+        for (String disease : prohibited) {
+            if (history.toLowerCase().contains(disease)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

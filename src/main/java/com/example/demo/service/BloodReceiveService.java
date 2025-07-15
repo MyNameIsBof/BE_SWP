@@ -5,6 +5,7 @@ import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
 import com.example.demo.dto.response.BloodReceiveListResponse;
 import com.example.demo.dto.response.BloodRegisterListResponse;
+import com.example.demo.dto.response.ReceiveHistoryResponse;
 import com.example.demo.entity.*;
 import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.enums.BloodType;
@@ -343,4 +344,29 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                         .build()
                 ).collect(Collectors.toList());
     }
+
+    public List<ReceiveHistoryResponse> getListReceiveHistory() {
+        User currentUser = authenticationService.getCurrentUser();
+
+        // Kiểm tra quyền truy cập
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn nhận máu");
+        }
+
+        List<BloodReceiveHistory> bloodReceives = bloodReceiveHistoryRepository.findAll();
+
+        if (bloodReceives.isEmpty()) {
+            throw new GlobalException("Không có lịch sử nhận máu nào được tìm thấy");
+        }
+
+        return bloodReceives.stream()
+                .map(bloodReceive -> ReceiveHistoryResponse.builder()
+                        .id(bloodReceive.getId())
+                        .receiveDate(bloodReceive.getReceiveDate())
+                        .unit(bloodReceive.getUnit())
+                        .bloodType(bloodReceive.getBloodType())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }

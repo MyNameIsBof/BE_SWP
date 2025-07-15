@@ -4,6 +4,7 @@ import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
 import com.example.demo.dto.response.BloodReceiveListResponse;
+import com.example.demo.dto.response.ReceiveHistoryResponse;
 import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.service.BloodReceiveService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,6 +76,13 @@ public class BloodReceiveAPI {
     @Operation(summary = "Lấy danh sách yêu cầu nhận máu theo ID người dùng")
     public ResponseEntity<List<BloodReceiveListResponse>> getBloodReceiveByUserId(@RequestParam Long userId) {
         List<BloodReceiveListResponse> result = bloodReceiveService.getByUserId(userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/get-list-receive")
+    @Operation(summary = "Lấy danh sách lịch sử nhận máu")
+    public ResponseEntity<List<ReceiveHistoryResponse>> getListReceiveHistory(){
+        List<ReceiveHistoryResponse> result = bloodReceiveService.getListReceiveHistory();
         return ResponseEntity.ok(result);
     }
 }
