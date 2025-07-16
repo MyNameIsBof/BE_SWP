@@ -12,12 +12,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class NotificationCreateRequest {
-    @NotBlank(message = "Title cannot be blank")
+    @NotBlank(message = "Title không được để trống")
     String title;
-    @NotBlank(message = "Message cannot be blank")
+    @NotBlank(message = "Message không được để trống")
     String message;
-    @NotNull(message = "Type cannot be null")
+    @NotNull(message = "Type không được để trống")
     NotificationType type;
-    @NotNull(message = "Recipient ID cannot be null")
+    @NotNull(message = "Recipient ID không được để trống")
     Long recipientId;
 }

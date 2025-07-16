@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class HistoryResponse {
+public class DonationHistoryResponse {
     long id;
     String fullName;
     LocalDate completedDate;

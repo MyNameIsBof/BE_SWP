@@ -4,6 +4,7 @@ import com.example.demo.dto.request.UpdateStatusRequest;
 import com.example.demo.dto.request.UserRequest;
 import com.example.demo.dto.response.CheckDonationAbilityResponse;
 import com.example.demo.dto.response.RemindResponse;
+import com.example.demo.dto.response.UpdateUserResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
@@ -26,7 +27,7 @@ public class UserService {
     @Autowired
     AuthenticationService authenticationService;
 
-    public UserResponse updateUser(UserRequest userRequest){;
+    public UpdateUserResponse updateUser(UserRequest userRequest){;
         User currentUser = authenticationService.getCurrentUser();
         if (currentUser != null) {
             Optional.ofNullable(userRequest.getFullName()).ifPresent(currentUser::setFullName);
@@ -47,18 +48,19 @@ public class UserService {
 
 
             authenticationRepository.save(currentUser);
-            UserResponse userResponse = UserResponse.builder()
-                    .fullName(userRequest.getFullName())
-                    .phone(userRequest.getPhone())
-                    .address(userRequest.getAddress())
-                    .gender(userRequest.getGender())
-                    .birthdate(userRequest.getBirthdate())
-                    .height(userRequest.getHeight())
-                    .weight(userRequest.getWeight())
-                    .medicalHistory(userRequest.getMedicalHistory())
-                    .emergencyName(userRequest.getEmergencyName())
-                    .emergencyPhone(userRequest.getEmergencyPhone())
-                    .bloodType(userRequest.getBloodType())
+            UpdateUserResponse userResponse = UpdateUserResponse.builder()
+                    .id(currentUser.getId())
+                    .fullName(currentUser.getFullName())
+                    .phone(currentUser.getPhone())
+                    .address(currentUser.getAddress())
+                    .gender(currentUser.getGender())
+                    .birthdate(currentUser.getBirthdate())
+                    .height(currentUser.getHeight())
+                    .weight(currentUser.getWeight())
+                    .medicalHistory(currentUser.getMedicalHistory())
+                    .emergencyName(currentUser.getEmergencyName())
+                    .emergencyPhone(currentUser.getEmergencyPhone())
+                    .bloodType(currentUser.getBloodType())
                     .build();
 
             return userResponse;

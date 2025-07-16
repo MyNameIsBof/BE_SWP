@@ -26,17 +26,17 @@ public class BloodReceiveRequest {
     @NotNull(message = "Chiều cao là bắt buộc")
     @Min(value = 50, message = "Chiều cao phải ít nhất 50cm")
     @Max(value = 250, message = "Chiều cao phải dưới 250cm")
-    @Schema(example = "175.5", description = "Chiều cao của bệnh nhân tính bằng centimeters")
+    @Schema(example = "175", description = "Chiều cao của bệnh nhân tính bằng centimeters")
     double height;
 
     @NotNull(message = "Cân nặng là bắt buộc")
     @Min(value = 30, message = "Cân nặng phải ít nhất 30kg")
     @Max(value = 300, message = "Cân nặng phải dưới 300kg")
-    @Schema(example = "70.3", description = "Cân nặng của bệnh nhân tính bằng kilograms")
+    @Schema(example = "70", description = "Cân nặng của bệnh nhân tính bằng kilograms")
     double weight;
 
     @Past(message = "Ngày hiến máu cuối cùng phải trong quá khứ")
-    @Schema(example = "2023-05-20", description = "Ngày hiến máu cuối cùng của bệnh nhân")
+    @Schema(example = "2025-05-20", description = "Ngày hiến máu cuối cùng của bệnh nhân")
     LocalDate lastDonation;
 
     @Size(max = 1000, message = "Tiền sử y tế phải ít hơn 1000 ký tự")
@@ -53,7 +53,7 @@ public class BloodReceiveRequest {
 
     @NotNull(message = "Ngày mong muốn là bắt buộc")
     @FutureOrPresent(message = "Ngày mong muốn phải là hôm nay hoặc trong tương lai")
-    @Schema(example = "2023-10-15", description = "Ngày yêu cầu nhận máu")
+    @Schema(example = "2025-10-15", description = "Ngày yêu cầu nhận máu")
     LocalDate wantedDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
@@ -61,10 +61,10 @@ public class BloodReceiveRequest {
     LocalTime wantedHour;
 
     @Pattern(regexp = "^[A-Za-z\\s]{2,50}$", message = "Tên liên hệ khẩn cấp phải từ 2-50 ký tự và chỉ chứa chữ cái")
-    @Schema(example = "John Smith", description = "Tên người liên hệ khẩn cấp")
+    @Schema(example = "Nguyễn Văn A", description = "Tên người liên hệ khẩn cấp")
     String emergencyName;
 
     @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Số điện thoại khẩn cấp phải là số điện thoại hợp lệ")
-    @Schema(example = "+12345678901", description = "Số điện thoại người liên hệ khẩn cấp")
+    @Schema(example = "0123456789", description = "Số điện thoại người liên hệ khẩn cấp")
     String emergencyPhone;
 }

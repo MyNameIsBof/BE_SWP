@@ -42,7 +42,7 @@ public class UserAPI {
 
     @PutMapping("update-user")
     @Operation(summary = "Cập nhật thông tin người dùng")
-    public ResponseEntity<UserResponse> update(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UpdateUserResponse> update(@RequestBody UserRequest userRequest) {
         return ResponseEntity.ok(updateUserService.updateUser(userRequest));
     }
 

@@ -2,10 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodRegisterRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
-import com.example.demo.dto.response.BloodRegisterGetAllResponse;
+import com.example.demo.dto.response.BloodRegisterHistoryResponse;
 import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
-import com.example.demo.dto.response.HistoryResponse;
+import com.example.demo.dto.response.DonationHistoryResponse;
 import com.example.demo.entity.*;
 import com.example.demo.enums.BloodInventoryStatus;
 import com.example.demo.enums.BloodRegisterStatus;
@@ -245,7 +245,7 @@ public class BloodRegisterService {
                 .collect(Collectors.toList());
     }
 
-    public List<HistoryResponse> getHistoryByUserId(Long userId) {
+    public List<DonationHistoryResponse> getHistoryByUserId(Long userId) {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findByUserId(userId);
 
         if (bloodRegisters.isEmpty()) {
@@ -259,7 +259,7 @@ public class BloodRegisterService {
                     float unit = bloodOpt.map(BloodDonationHistory::getUnit).orElse(0f);
                     LocalDate completedDate = bloodOpt.map(BloodDonationHistory::getDonationDate).orElse(null);
 
-                    return HistoryResponse.builder()
+                    return DonationHistoryResponse.builder()
                             .id(bloodRegister.getUser().getId())
                             .fullName(bloodRegister.getUser().getFullName())
                             .completedDate(completedDate)
@@ -385,7 +385,7 @@ public class BloodRegisterService {
     }
 
 
-    public List<BloodRegisterGetAllResponse> getListDonation() {
+    public List<BloodRegisterHistoryResponse> getListDonation() {
         List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
 
@@ -406,7 +406,7 @@ public class BloodRegisterService {
                     User user = br.getUser();
                     int completedCount = getCompletedCountByUser(user.getId());
 
-                    return BloodRegisterGetAllResponse.builder()
+                    return BloodRegisterHistoryResponse.builder()
                             .id(user.getId())
                             .fullName(user.getFullName())
                             .email(user.getEmail())

@@ -13,13 +13,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class BloodRegisterGetAllResponse {
+public class ReceiveHistoryResponse {
     long id;
-    String fullName;
-    String phone;
-    String email;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
-    LocalDate lastDonation;
-    Integer unitDonation;
+    LocalDate receiveDate;
+    float unit;
 }
