@@ -219,10 +219,11 @@ public class HealthCheckService {
     }
 
     private boolean isBloodPressureNormal(Double bloodPressure) {
-        // Giả sử bạn lưu huyết áp là 12080 (tức là 120/80)
-        int systolic = (int)(bloodPressure / 100);     // Tâm thu
-        int diastolic = (int)(bloodPressure % 100);    // Tâm trương
-        return systolic >= 90 && systolic <= 140 && diastolic >= 60 && diastolic <= 90;
+        if (bloodPressure == null) {
+            return false;
+        }
+
+        return bloodPressure >= 50 && bloodPressure <= 250;
     }
 
     private boolean containsProhibitedDisease(String history) {

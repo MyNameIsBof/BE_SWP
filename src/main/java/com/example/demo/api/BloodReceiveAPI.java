@@ -4,6 +4,7 @@ import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.BloodReceiveResponse;
 import com.example.demo.dto.response.BloodReceiveListResponse;
+import com.example.demo.dto.response.EmergencyBloodTypeResponse;
 import com.example.demo.dto.response.ReceiveHistoryResponse;
 import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.service.BloodReceiveService;
@@ -75,7 +76,7 @@ public class BloodReceiveAPI {
     @GetMapping("/get-blood-receive-by-user-id")
     @Operation(summary = "Lấy danh sách yêu cầu nhận máu theo ID người dùng")
     public ResponseEntity<List<BloodReceiveListResponse>> getBloodReceiveByUserId(@RequestParam Long userId) {
-        List<BloodReceiveListResponse> result = bloodReceiveService.getByUserId(userId);
+        List<BloodReceiveListResponse> result = bloodReceiveService.getListByUserId(userId);
         return ResponseEntity.ok(result);
     }
 
@@ -83,6 +84,13 @@ public class BloodReceiveAPI {
     @Operation(summary = "Lấy danh sách lịch sử nhận máu")
     public ResponseEntity<List<ReceiveHistoryResponse>> getListReceiveHistory(){
         List<ReceiveHistoryResponse> result = bloodReceiveService.getListReceiveHistory();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/get-emergency-bloodType")
+    @Operation(summary = "Lấy danh sách loại máu khẩn cấp")
+    public ResponseEntity<List<EmergencyBloodTypeResponse>> getEmergencyBloodType() {
+        List<EmergencyBloodTypeResponse> result = bloodReceiveService.getEmergencyBloodType();
         return ResponseEntity.ok(result);
     }
 }

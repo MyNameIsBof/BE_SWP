@@ -2,10 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodReceiveRequest;
 import com.example.demo.dto.request.BloodSetCompletedRequest;
-import com.example.demo.dto.response.BloodReceiveResponse;
-import com.example.demo.dto.response.BloodReceiveListResponse;
-import com.example.demo.dto.response.BloodRegisterListResponse;
-import com.example.demo.dto.response.ReceiveHistoryResponse;
+import com.example.demo.dto.response.*;
 import com.example.demo.entity.*;
 import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.enums.BloodType;
@@ -332,7 +329,7 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         return createResponseFromUserAndReceive(currentUser, receive);
     }
 
-    public List<BloodReceiveListResponse> getByUserId(Long userId) {
+    public List<BloodReceiveListResponse> getListByUserId(Long userId) {
         List<BloodReceive> bloodReceives = bloodReceiveRepository.findByUserId(userId);
 
         if (bloodReceives.isEmpty()) {
@@ -373,6 +370,19 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                         .receiveDate(bloodReceive.getReceiveDate())
                         .unit(bloodReceive.getUnit())
                         .bloodType(bloodReceive.getBloodType())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<EmergencyBloodTypeResponse> getEmergencyBloodType() {
+        List<BloodReceive> bloodReceives = bloodReceiveRepository.findByIsEmergencyTrue();
+
+        return bloodReceives.stream()
+                .filter(bloodReceive -> bloodReceive.getUser() != null)
+                .map(bloodReceive -> bloodReceive.getUser().getBloodType())
+                .distinct() // ← Loại bỏ trùng lặp
+                .map(bloodType -> EmergencyBloodTypeResponse.builder()
+                        .bloodType(bloodType)
                         .build())
                 .collect(Collectors.toList());
     }
