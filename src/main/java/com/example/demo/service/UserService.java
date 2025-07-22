@@ -61,6 +61,7 @@ public class UserService {
                     .emergencyName(currentUser.getEmergencyName())
                     .emergencyPhone(currentUser.getEmergencyPhone())
                     .bloodType(currentUser.getBloodType())
+                    .lastDonation(currentUser.getLastDonation())
                     .build();
 
             return userResponse;

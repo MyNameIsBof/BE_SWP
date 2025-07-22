@@ -9,6 +9,7 @@ import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.Gender;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
+import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.repository.BloodRegisterRepository;
 import com.example.demo.repository.HealthCheckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class HealthCheckService {
 
     @Autowired
     HealthCheckRepository healthCheckRepository;
+
+    @Autowired
+    AuthenticationRepository authenticationRepository;
 
     public HealthCheckResponse create(HealthCheckRequest healthCheckRequest){
         // 1. Lấy nhân viên hiện tại đang thao tác
@@ -60,12 +64,15 @@ public class HealthCheckService {
                 .bloodType(bloodRegister.getUser().getBloodType())
                 .staffName(currentUser.getFullName())
                 .fullName(bloodRegister.getUser().getFullName())
-                .bloodType(bloodRegister.getUser().getBloodType())
                 .medicalHistory(bloodRegister.getUser().getMedicalHistory())
                 .status(healthCheckRequest.isStatus())
                 .reason(healthCheckRequest.getReason())
                 .bloodRegister(bloodRegister)
                 .build();
+
+        user.setWeight(healthCheckRequest.getWeight());
+        user.setHeight(healthCheckRequest.getHeight());
+        authenticationRepository.save(user);
 
         if (!healthCheckRequest.isStatus()) {
             bloodRegister.setStatus(BloodRegisterStatus.REJECTED);
@@ -205,7 +212,7 @@ public class HealthCheckService {
             throw new GlobalException("Nữ phải ≥ 42kg để hiến máu.");
         }
 
-        if (request.getTemperature() < 36 || request.getTemperature() > 37.5) {
+        if (request.getTemperature() < 35 || request.getTemperature() > 38) {
             throw new GlobalException("Nhiệt độ cơ thể không hợp lệ.");
         }
 
