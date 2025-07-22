@@ -20,9 +20,7 @@ import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -388,6 +386,27 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                         .bloodType(bloodType)
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getMonthlyReceivedCount(int year) {
+        List<Object[]> rawData = bloodReceiveRepository.countCompletedReceivesPerMonth(year);
+
+        Map<Integer, Long> resultMap = new HashMap<>();
+        for (Object[] row : rawData) {
+            Integer month = ((Number) row[0]).intValue();
+            Long total = ((Number) row[1]).longValue();
+            resultMap.put(month, total);
+        }
+
+        List<Map<String, Object>> finalResult = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("month", month);
+            item.put("totalCompletedReceives", resultMap.getOrDefault(month, 0L));
+            finalResult.add(item);
+        }
+
+        return finalResult;
     }
 
 }

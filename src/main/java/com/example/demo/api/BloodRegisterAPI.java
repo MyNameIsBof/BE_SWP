@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/blood-register")
@@ -84,5 +85,13 @@ public class BloodRegisterAPI {
         List<BloodRegisterHistoryResponse> result = bloodRegisterService.getListDonation();
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/completed-monthly/{year}")
+    @Operation(summary = "Lấy số lượng đơn hiến máu đã hoàn thành theo tháng trong năm")
+    public ResponseEntity<List<Map<String, Object>>> getMonthlyCompleted(@PathVariable @RequestParam(defaultValue = "2025")  int year) {
+        List<Map<String, Object>> result = bloodRegisterService.getMonthlyCompletedCount(year);
+        return ResponseEntity.ok(result);
+    }
+
 
 }

@@ -13,7 +13,7 @@ import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.exception.exceptions.ResourceNotFoundException;
 import com.example.demo.mapper.BloodInventoryMapper;
 import com.example.demo.repository.BloodInventoryRepository;
-import com.example.demo.repository.BloodRepository;
+import com.example.demo.repository.BloodDonationHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class BloodInventoryService {
     BloodInventoryMapper bloodInventoryMapper;
 
     @Autowired
-    BloodRepository bloodRepository;
+    BloodDonationHistoryRepository bloodDonationHistoryRepository;
 
     @Autowired
     AuthenticationService authenticationService;
@@ -158,7 +158,7 @@ public class BloodInventoryService {
         try {
             LocalDate today = LocalDate.now();
             // Danh sách máu hết hạn
-            List<BloodDonationHistory> expiredBloodDonationHistoryList = bloodRepository.findByExpirationDateBefore(today);
+            List<BloodDonationHistory> expiredBloodDonationHistoryList = bloodDonationHistoryRepository.findByExpirationDateBefore(today);
 
             for (BloodDonationHistory expiredBloodDonationHistory : expiredBloodDonationHistoryList) {
                 BloodInventory inventory = expiredBloodDonationHistory.getBloodInventory();
