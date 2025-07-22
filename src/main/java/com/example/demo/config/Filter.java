@@ -44,7 +44,8 @@ public class Filter  extends OncePerRequestFilter {
             "/api/user/verify-otp",
             "/api/user/reset-password",
             "/api/blogs/get-all",
-            "/api/user/activate"
+            "/api/user/activate",
+            "/api/blood-receive/get-emergency-bloodType"
     );
 
     public boolean checkIsPublicAPI(String uri) {

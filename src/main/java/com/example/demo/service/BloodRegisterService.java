@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +40,7 @@ public class BloodRegisterService {
     BloodInventoryRepository bloodInventoryRepository;
 
     @Autowired
-    BloodRepository bloodRepository;
+    BloodDonationHistoryRepository bloodDonationHistoryRepository;
 
     @Autowired
     NotificationService notificationService;
@@ -255,7 +252,7 @@ public class BloodRegisterService {
         return bloodRegisters.stream()
                 .filter(bloodRegister -> bloodRegister.getStatus() == BloodRegisterStatus.COMPLETED)
                 .map(bloodRegister -> {
-                    Optional<BloodDonationHistory> bloodOpt = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
+                    Optional<BloodDonationHistory> bloodOpt = bloodDonationHistoryRepository.findByBloodRegisterId(bloodRegister.getId());
                     float unit = bloodOpt.map(BloodDonationHistory::getUnit).orElse(0f);
                     LocalDate completedDate = bloodOpt.map(BloodDonationHistory::getDonationDate).orElse(null);
 
@@ -281,7 +278,7 @@ public class BloodRegisterService {
                 .map(bloodRegister -> {
                     float unit = 0;
                     if (bloodRegister.getStatus() == BloodRegisterStatus.COMPLETED) {
-                        Optional<BloodDonationHistory> blood = bloodRepository.findByBloodRegisterId(bloodRegister.getId());
+                        Optional<BloodDonationHistory> blood = bloodDonationHistoryRepository.findByBloodRegisterId(bloodRegister.getId());
                         if (blood.isPresent()) {
                             unit = blood.get().getUnit();
                         }
@@ -339,7 +336,7 @@ public class BloodRegisterService {
                         .bloodRegister(bloodRegister)
                         .bloodInventory(bloodInventory)
                         .build();
-                bloodRepository.save(bloodDonationHistory);
+                bloodDonationHistoryRepository.save(bloodDonationHistory);
 
                 // 4. Cập nhật trạng thái đơn đăng ký
                 bloodRegister.setStatus(BloodRegisterStatus.COMPLETED);
@@ -422,5 +419,27 @@ public class BloodRegisterService {
     public int getCompletedCountByUser(Long userId) {
         return (int) bloodRegisterRepository.countByUserIdAndStatus(userId, BloodRegisterStatus.COMPLETED);
     }
+
+    public List<Map<String, Object>> getMonthlyCompletedCount(int year) {
+        List<Object[]> rawData = bloodRegisterRepository.countCompletedRegistersPerMonth(year);
+
+        Map<Integer, Long> resultMap = new HashMap<>();
+        for (Object[] row : rawData) {
+            Integer month = ((Number) row[0]).intValue();
+            Long total = ((Number) row[1]).longValue();
+            resultMap.put(month, total);
+        }
+
+        List<Map<String, Object>> finalResult = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("month", month);
+            item.put("totalCompletedRequests", resultMap.getOrDefault(month, 0L));
+            finalResult.add(item);
+        }
+
+        return finalResult;
+    }
+
 
 }

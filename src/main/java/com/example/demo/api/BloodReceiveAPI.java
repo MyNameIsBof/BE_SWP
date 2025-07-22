@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/blood-receive")
@@ -92,5 +93,13 @@ public class BloodReceiveAPI {
     public ResponseEntity<List<EmergencyBloodTypeResponse>> getEmergencyBloodType() {
         List<EmergencyBloodTypeResponse> result = bloodReceiveService.getEmergencyBloodType();
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/monthly-completed")
+    @Operation(summary = "Lấy số lượng yêu cầu nhận máu đã hoàn thành theo tháng trong năm")
+    public ResponseEntity<List<Map<String, Object>>> getMonthlyCompletedReceives( @PathVariable
+            @RequestParam(defaultValue = "2025") int year) {
+        List<Map<String, Object>> data = bloodReceiveService.getMonthlyReceivedCount(year);
+        return ResponseEntity.ok(data);
     }
 }
