@@ -5,6 +5,7 @@ import com.example.demo.dto.request.BloodSetCompletedRequest;
 import com.example.demo.dto.response.*;
 import com.example.demo.entity.*;
 import com.example.demo.enums.BloodReceiveStatus;
+import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.AuthenticationException;
@@ -15,6 +16,7 @@ import com.example.demo.repository.BloodReceiveHistoryRepository;
 import com.example.demo.repository.BloodReceiveRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -379,6 +381,7 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
 
         return bloodReceives.stream()
                 .filter(bloodReceive -> bloodReceive.getUser() != null)
+                .filter(bloodReceive -> BloodReceiveStatus.APPROVED.equals(bloodReceive.getStatus()))
                 .map(bloodReceive -> bloodReceive.getUser().getBloodType())
                 .distinct() // ← Loại bỏ trùng lặp
                 .map(bloodType -> EmergencyBloodTypeResponse.builder()

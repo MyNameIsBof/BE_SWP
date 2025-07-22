@@ -10,6 +10,7 @@ import com.example.demo.enums.BloodRegisterStatus;
 import com.example.demo.service.BloodRegisterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class BloodRegisterAPI {
 
     @PostMapping("/create")
     @Operation(summary = "Tạo 1 đơn hiến máu mới")
-    public ResponseEntity<BloodRegisterResponse> create(@RequestBody BloodRegisterRequest bloodRegisterRequest) {
+    public ResponseEntity<BloodRegisterResponse> create(@Valid @RequestBody BloodRegisterRequest bloodRegisterRequest) {
         return ResponseEntity.ok(bloodRegisterService.create(bloodRegisterRequest));
     }
 
