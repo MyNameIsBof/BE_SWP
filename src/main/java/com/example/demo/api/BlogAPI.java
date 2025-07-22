@@ -7,6 +7,7 @@ import com.example.demo.dto.response.BlogResponse;
 import com.example.demo.service.BlogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -43,12 +44,12 @@ public class BlogAPI {
     }
 
     @PostMapping
-    public ResponseEntity<BlogResponse> createBlog(@RequestBody BlogRequest blogRequest) {
+    public ResponseEntity<BlogResponse> createBlog(@Valid @RequestBody BlogRequest blogRequest) {
         return ResponseEntity.ok(blogService.createBlog(blogRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BlogResponse> updateBlog(@PathVariable Long id, @RequestBody BlogRequest blogRequest) {
+    public ResponseEntity<BlogResponse> updateBlog(@Valid @PathVariable Long id, @RequestBody BlogRequest blogRequest) {
         return ResponseEntity.ok(blogService.updateBlog(id, blogRequest));
     }
 

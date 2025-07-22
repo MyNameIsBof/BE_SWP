@@ -2,6 +2,7 @@ package com.example.demo.api;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
+import com.example.demo.dto.response.BloodTypeTotalResponse;
 import com.example.demo.repository.BloodInventoryRepository;
 import com.example.demo.service.BloodInventoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +27,7 @@ public class BloodInventoryAPI {
 
     @GetMapping("/get-all")
     @Operation(summary = "Lấy danh sách tất cả kho máu")
-    public ResponseEntity<List<BloodInventoryResponse>> getAll() {
+    public ResponseEntity<List<BloodTypeTotalResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 

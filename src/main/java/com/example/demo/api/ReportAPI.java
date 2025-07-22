@@ -4,6 +4,7 @@ import com.example.demo.dto.request.ReportRequest;
 import com.example.demo.dto.response.ReportResponse;
 import com.example.demo.service.ReportService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class ReportAPI {
 
     // POST /api/report/create
     @PostMapping("/create")
-    public ResponseEntity<ReportResponse> createReport(@RequestBody ReportRequest request) {
+    public ResponseEntity<ReportResponse> createReport(@Valid @RequestBody ReportRequest request) {
         return ResponseEntity.ok(reportService.createReport(request));
     }
 
@@ -40,7 +41,7 @@ public class ReportAPI {
 
     // PATCH /api/report/update/{id}
     @PatchMapping("/update/{id}")
-    public ResponseEntity<ReportResponse> updateReport(@PathVariable Long id, @RequestBody ReportRequest request) {
+    public ResponseEntity<ReportResponse> updateReport(@Valid @PathVariable Long id, @RequestBody ReportRequest request) {
         ReportResponse response = reportService.updateReport(id, request); // Nếu không tìm thấy sẽ ném ResourceNotFoundException
         return ResponseEntity.ok(response);
     }
