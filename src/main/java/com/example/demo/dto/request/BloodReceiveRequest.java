@@ -60,7 +60,6 @@ public class BloodReceiveRequest {
     @Schema(example = "10:30:00", description = "Thời gian yêu cầu nhận máu")
     LocalTime wantedHour;
 
-    @Pattern(regexp = "^[A-Za-z\\s]{2,50}$", message = "Tên liên hệ khẩn cấp phải từ 2-50 ký tự và chỉ chứa chữ cái")
     @Schema(example = "Nguyễn Văn A", description = "Tên người liên hệ khẩn cấp")
     String emergencyName;
 

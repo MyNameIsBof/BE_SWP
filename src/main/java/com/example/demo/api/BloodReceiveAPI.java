@@ -10,6 +10,7 @@ import com.example.demo.enums.BloodReceiveStatus;
 import com.example.demo.service.BloodReceiveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,13 +43,13 @@ public class BloodReceiveAPI {
 
     @PostMapping("/create")
     @Operation(summary = "Tạo 1 yêu cầu nhận máu mới")
-    public ResponseEntity<BloodReceiveResponse> create(@RequestBody BloodReceiveRequest request) {
+    public ResponseEntity<BloodReceiveResponse> create(@Valid @RequestBody BloodReceiveRequest request) {
         return ResponseEntity.ok(bloodReceiveService.create(request));
     }
 
     @PutMapping("/update/{id}")
     @Operation(summary = "Cập nhật thông tin yêu cầu nhận máu theo ID")
-    public ResponseEntity<BloodReceiveResponse> update(@PathVariable Long id,
+    public ResponseEntity<BloodReceiveResponse> update(@Valid @PathVariable Long id,
                                                        @RequestBody BloodReceiveRequest request) {
         return ResponseEntity.ok(bloodReceiveService.update(id, request));
     }
@@ -61,7 +62,7 @@ public class BloodReceiveAPI {
 
     @PatchMapping("/update-status/{id}")
     @Operation(summary = "Cập nhật trạng thái của yêu cầu nhận máu theo ID")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id,
+    public ResponseEntity<Void> updateStatus(@Valid @PathVariable Long id,
                                              @RequestParam BloodReceiveStatus status) {
         bloodReceiveService.updateStatus(id, status);
         return ResponseEntity.ok().build();

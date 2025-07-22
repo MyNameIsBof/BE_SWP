@@ -34,7 +34,7 @@ public class BloodRegisterAPI {
 
     @PutMapping("update/{id}")
     @Operation(summary = "Cập nhật thông tin đơn hiến máu theo ID")
-    public ResponseEntity<BloodRegisterResponse> update(@PathVariable Long id, @RequestBody BloodRegisterRequest bloodRegisterRequest) {
+    public ResponseEntity<BloodRegisterResponse> update(@Valid @PathVariable Long id, @RequestBody BloodRegisterRequest bloodRegisterRequest) {
         return ResponseEntity.ok(bloodRegisterService.update(id, bloodRegisterRequest));
     }
 

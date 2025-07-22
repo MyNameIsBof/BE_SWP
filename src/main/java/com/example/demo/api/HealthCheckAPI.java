@@ -6,6 +6,7 @@ import com.example.demo.dto.response.HealthCheckResponse;
 import com.example.demo.service.HealthCheckService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,14 @@ public class HealthCheckAPI {
 
     @PostMapping("/create")
     @Operation(summary = "Tạo mới kiểm tra sức khỏe cho người hiến máu")
-    public ResponseEntity<HealthCheckResponse> create(HealthCheckRequest healthCheckRequest) {
+    public ResponseEntity<HealthCheckResponse> create(@Valid HealthCheckRequest healthCheckRequest) {
         HealthCheckResponse response = healthCheckService.create(healthCheckRequest);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/update/{id}")
     @Operation(summary = "Cập nhật thông tin kiểm tra sức khỏe")
-    public ResponseEntity<HealthCheckResponse> update(@PathVariable Long id, @RequestBody HealthCheckRequest healthCheckRequest) {
+    public ResponseEntity<HealthCheckResponse> update(@Valid @PathVariable Long id, @RequestBody HealthCheckRequest healthCheckRequest) {
         HealthCheckResponse response = healthCheckService.update(id, healthCheckRequest);
         return ResponseEntity.ok(response);
     }

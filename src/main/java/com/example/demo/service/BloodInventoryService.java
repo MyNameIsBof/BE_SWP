@@ -2,10 +2,12 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.BloodInventoryRequest;
 import com.example.demo.dto.response.BloodInventoryResponse;
+import com.example.demo.dto.response.BloodTypeTotalResponse;
 import com.example.demo.entity.BloodDonationHistory;
 import com.example.demo.entity.BloodInventory;
 import com.example.demo.entity.User;
 import com.example.demo.enums.BloodInventoryStatus;
+import com.example.demo.enums.BloodType;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.exception.exceptions.ResourceNotFoundException;
@@ -17,7 +19,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +38,7 @@ public class BloodInventoryService {
     @Autowired
     AuthenticationService authenticationService;
 
-    public List<BloodInventoryResponse> getAll() {
+    public List<BloodTypeTotalResponse> getAll() {
         try {
             User currentUser = authenticationService.getCurrentUser();
             if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
@@ -43,13 +47,20 @@ public class BloodInventoryService {
 
             List<BloodInventory> inventories = bloodInventoryRepository.findAll();
 
-            return inventories.stream()
-                    .map(this::toResponse)
+            // Trả về 8 loại máu và tổng số lượng từng loại
+            return Arrays.stream(BloodType.values())
+                    .map(type -> new BloodTypeTotalResponse(
+                            type,
+                            inventories.stream()
+                                    .filter(inv -> type.equals(inv.getBloodType()))
+                                    .mapToInt(inv -> (int)inv.getUnitsAvailable()) // hoặc .getQuantity() nếu dùng trường này
+                                    .sum()
+                    ))
                     .collect(Collectors.toList());
         } catch (GlobalException e) {
             throw e;
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi truy xuất kho máu: " + e.getMessage());
+            throw new GlobalException("Lỗi khi truy xuất tổng kho máu: " + e.getMessage());
         }
     }
 
@@ -141,7 +152,7 @@ public class BloodInventoryService {
     private BloodInventoryResponse toResponse(BloodInventory entity) {
         return bloodInventoryMapper.toBloodInventoryResponse(entity);
     }
-
+/// ////////////////////////////// khong dc xoa /////////////////////////////////////////////////////////////////////
     @Scheduled(cron = "0 0 0 * * *") // Chạy mỗi ngày lúc 0h00
     public void resetExpiredBloodUnits() {
         try {

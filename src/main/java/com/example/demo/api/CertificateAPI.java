@@ -5,6 +5,7 @@ import com.example.demo.dto.response.CertificateResponse;
 import com.example.demo.service.CertificateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class CertificateAPI {
 
     @PostMapping("/create-certificate")
     @Operation(summary = "Tạo chứng nhận hiến máu")
-    public ResponseEntity<CertificateResponse> create(@RequestBody CertififcateRequest request){
+    public ResponseEntity<CertificateResponse> create(@Valid @RequestBody CertififcateRequest request){
         return ResponseEntity.ok(certificateService.create(request));
     }
 
