@@ -40,4 +40,12 @@ public class GlobalException extends RuntimeException {
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(InactiveUserException.class)
+    public ResponseEntity<Map<String, String>> handleInactiveUserException(InactiveUserException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN) // hoặc UNAUTHORIZED nếu muốn 401
+                .body(Map.of("message", ex.getMessage()));
+    }
+
 }

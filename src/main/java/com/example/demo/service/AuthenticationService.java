@@ -13,8 +13,7 @@ import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.repository.BloodTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,28 +62,27 @@ public class AuthenticationService implements UserDetailsService {
             throw new AuthenticationException("Email đã được sử dụng");
         }
     }
-    public LoginResponse login(LoginRequest loginRequest){
-
-        try{
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginRequest.getEmail(),
-                    loginRequest.getPassword()
-            ));
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("Thong tin dang nhap sai roi");
-            throw new AuthenticationException("Sai email hoặc mật khẩu") {
-            };
+    public LoginResponse login(LoginRequest loginRequest) {
+        User user = authenticationRepository.findUserByEmail(loginRequest.getEmail());
+        if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new AuthenticationException("Sai email hoặc mật khẩu");
+        }
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new AuthenticationException("Tài khoản đã bị khóa.");
+        }
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new AuthenticationException("Tài khoản chưa được kích hoạt.");
         }
 
-        User user = authenticationRepository.findUserByEmail(loginRequest.email);
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
 
         LoginResponse response = userMapper.toUserResponse(user);
         response.setBloodType(user.getBloodType());
         response.setRole(user.getRole());
         response.setToken(tokenService.generateToken(user));
-
-        return response ;
+        return response;
     }
 
 
@@ -121,6 +119,5 @@ public class AuthenticationService implements UserDetailsService {
                 .role(user.getRole())
                 .build();
     }
-
 
 }
