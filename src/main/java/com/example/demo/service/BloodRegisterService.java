@@ -7,9 +7,7 @@ import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.dto.response.DonationHistoryResponse;
 import com.example.demo.entity.*;
-import com.example.demo.enums.BloodInventoryStatus;
-import com.example.demo.enums.BloodRegisterStatus;
-import com.example.demo.enums.Role;
+import com.example.demo.enums.*;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.mapper.BloodRegisterMapper;
@@ -19,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,9 +44,14 @@ public class BloodRegisterService {
     @Autowired
     NotificationService notificationService;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
+
+
     public List<BloodRegisterListResponse> getAll() {
-        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
+        List<BloodRegister> bloodRegisters = bloodRegisterRepository.findAll();
         if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký hiến máu");
         }
@@ -442,6 +446,50 @@ public class BloodRegisterService {
         }
 
         return finalResult;
+    }
+
+    ///thông báo xin máu /////
+    public int inviteEligibleUsers(String bloodType) {
+
+        BloodType typeEnum;
+        //phân role
+        User currentUser = authenticationService.getCurrentUser();
+        if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+            throw new GlobalException("Bạn không có quyền gửi lời mời hiến máu");
+        }
+        try {
+            typeEnum = BloodType.valueOf(bloodType);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Nhóm máu không hợp lệ: " + bloodType);
+        }
+
+        List<User> allUsers = authenticationRepository.findByBloodType(typeEnum);
+
+        LocalDate now = LocalDate.now();
+        List<User> eligibleUsers = allUsers.stream()
+                .filter(user -> user.getLastDonation() == null ||
+                        Period.between(user.getLastDonation(), now).getMonths() >= 3)
+                .toList();
+
+        if (eligibleUsers.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy người dùng phù hợp với nhóm máu " + bloodType);
+        }
+
+        String title = "Lời mời hiến máu";
+        String message = "Bạn có nhóm máu phù hợp và đủ điều kiện để hiến máu. Hãy tham gia để cứu người!";
+        int count = 0;
+        for (User user : eligibleUsers) {
+            Notification notification = Notification.builder()
+                    .title(title)
+                    .message(message)
+                    .type(NotificationType.BLOOD_DONATION_INVITE)
+                    .recipient(user)
+                    .read(false)
+                    .build();
+            notificationRepository.save(notification);
+            count++;
+        }
+        return count;
     }
 
 
