@@ -7,11 +7,14 @@ import com.example.demo.dto.response.BloodRegisterListResponse;
 import com.example.demo.dto.response.BloodRegisterResponse;
 import com.example.demo.dto.response.DonationHistoryResponse;
 import com.example.demo.enums.BloodRegisterStatus;
+import com.example.demo.repository.AuthenticationRepository;
+import com.example.demo.repository.NotificationRepository;
 import com.example.demo.service.BloodRegisterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,9 @@ import java.util.Map;
 public class BloodRegisterAPI {
     private final BloodRegisterService bloodRegisterService;
 
+    @Autowired
+    AuthenticationRepository authenticationRepository;
+    NotificationRepository notificationRepository;
 
     @PostMapping("/create")
     @Operation(summary = "Tạo 1 đơn hiến máu mới")
@@ -93,5 +99,19 @@ public class BloodRegisterAPI {
         return ResponseEntity.ok(result);
     }
 
-
+    @PostMapping("/invite")
+    @Operation(summary = "Gửi lời mời hiến máu cho người dùng phù hợp theo nhóm máu và ngày hiến máu cuối")
+    public ResponseEntity<Map<String, Object>> invite(@RequestParam String bloodType) {
+        int count = 0;
+        try {
+            count = bloodRegisterService.inviteEligibleUsers(bloodType);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Lỗi khi gửi lời mời: " + e.getMessage()));
+        }
+        Map<String, Object> result = Map.of(
+                "message", "Đã gửi lời mời hiến máu cho người phù hợp nhóm máu " + bloodType,
+                "count", count
+        );
+        return ResponseEntity.ok(result);
+    }
 }

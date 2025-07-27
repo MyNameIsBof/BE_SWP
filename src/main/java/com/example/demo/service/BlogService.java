@@ -68,6 +68,20 @@ public class BlogService {
         }
     }
 
+    //lấy chi tiết blog theo userId nếu còn hoạt động
+    public Optional<BlogResponse> getBlogByUserId(Long userId) {
+        try {
+            return blogRepository.findByAuthorIgnoreCase(userId.toString())
+                    .stream()
+                    .filter(blog -> blog.getStatus() == BlogStatus.ACTIVE)
+                    .findFirst()
+                    .map(this::convertToResponse);
+        } catch (Exception e) {
+            throw new GlobalException("Lỗi khi lấy chi tiết blog theo userId: " + e.getMessage());
+        }
+    }
+
+
     // Tạo blog mới
     public BlogResponse createBlog(BlogRequest request) {
         try {

@@ -95,4 +95,6 @@ public class NotificationAPI {
         notificationService.markAllAsReadForUser(userId);
         return ResponseEntity.ok().build();
     }
+
+
 }
