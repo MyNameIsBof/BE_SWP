@@ -16,8 +16,8 @@ import java.time.LocalDate;
 @Builder
 public class HealthCheckRequest {
     @NotNull(message = "Chiều cao không được để trống")
-    @DecimalMin(value = "50.0", message = "Chiều cao tối thiểu là 50 cm")
-    @DecimalMax(value = "250.0", message = "Chiều cao tối đa là 250 cm")
+//    @DecimalMin(value = "50.0", message = "Chiều cao tối thiểu là 50 cm")
+//    @DecimalMax(value = "250.0", message = "Chiều cao tối đa là 250 cm")
     Double height;
 
     @NotNull(message = "Cân nặng không được để trống")
@@ -30,6 +30,7 @@ public class HealthCheckRequest {
     Double bloodPressure;
 
     @NotNull(message = "Ngày khám không được để trống")
+            @FutureOrPresent(message = "Ngày khám phải là ngày hiện tại hoặc tương lai")
     LocalDate checkDate;
 
     boolean status;

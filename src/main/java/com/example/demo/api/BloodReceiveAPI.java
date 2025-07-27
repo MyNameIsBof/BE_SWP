@@ -103,4 +103,11 @@ public class BloodReceiveAPI {
         List<Map<String, Object>> data = bloodReceiveService.getMonthlyReceivedCount(year);
         return ResponseEntity.ok(data);
     }
+
+    @GetMapping("/get-list-receive-by-user-id")
+    @Operation(summary = "Lấy danh sách lịch sử nhận máu theo ID người dùng")
+    public ResponseEntity<List<ReceiveHistoryResponse>> getListReceiveByUserId(@RequestParam Long userId) {
+        List<ReceiveHistoryResponse> result = bloodReceiveService.getReceiveHistoryByUserId(userId);
+        return ResponseEntity.ok(result);
+    }
 }

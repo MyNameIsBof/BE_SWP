@@ -1,5 +1,8 @@
 package com.example.demo.dto.response;
 
+import com.example.demo.enums.BloodType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +16,8 @@ import java.time.LocalDate;
 public class DonationHistoryResponse {
     long id;
     String fullName;
+    @Enumerated(EnumType.STRING)
+    BloodType bloodType;
     LocalDate completedDate;
     float unit;
 }

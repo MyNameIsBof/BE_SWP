@@ -21,10 +21,10 @@ public class Certificate {
     long id;
     LocalDate issueDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "donor_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blood_register_id")
     @JsonIgnore
-    User donor;
+    BloodRegister bloodRegister;
 
     // Người cấp chứng nhận (staff)
     @ManyToOne(fetch = FetchType.LAZY)

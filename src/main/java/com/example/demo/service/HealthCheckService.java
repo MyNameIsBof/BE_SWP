@@ -39,6 +39,9 @@ public class HealthCheckService {
     public HealthCheckResponse create(HealthCheckRequest healthCheckRequest){
         // 1. Lấy nhân viên hiện tại đang thao tác
         User currentUser = authenticationService.getCurrentUser();
+        if(!currentUser.getRole().equals(Role.STAFF) && !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new GlobalException("Chỉ nhân viên mới có thể tạo bản ghi kiểm tra sức khỏe");
+        }
 
         // 2. Tìm đơn hiến máu
         BloodRegister bloodRegister = bloodRegisterRepository.findById(healthCheckRequest.getBloodRegisterId())
@@ -82,6 +85,10 @@ public class HealthCheckService {
 
         bloodRegister.setHealthCheck(healthCheck);
         bloodRegisterRepository.save(bloodRegister);
+
+        if(healthCheck.getHeight() < 50 || healthCheck.getHeight() > 250) {
+            throw new GlobalException("Chiều cao không hợp lệ, phải từ 50cm đến 250cm");
+        }
 
 
         // 5. Trả response có chứa tên người làm đơn và tiền sử bệnh
@@ -169,6 +176,7 @@ public class HealthCheckService {
                 .height(healthCheck.getHeight())
                 .weight(healthCheck.getWeight())
                 .temperature(healthCheck.getTemperature())
+                .bloodType(healthCheck.getBloodType())
                 .bloodPressure(healthCheck.getBloodPressure())
                 .checkDate(healthCheck.getCheckDate())
                 .staffName(healthCheck.getStaffName())

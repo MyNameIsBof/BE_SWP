@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @Builder
 public class ReceiveHistoryResponse {
     long id;
+    String fullName;
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
     LocalDate receiveDate;

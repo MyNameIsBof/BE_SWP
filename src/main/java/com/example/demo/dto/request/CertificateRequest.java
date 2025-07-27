@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class CertififcateRequest {
+public class CertificateRequest {
     @NotNull(message = "Ngày cấp không được để trống")
     LocalDate issueDate;
 

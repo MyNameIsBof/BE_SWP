@@ -99,6 +99,7 @@ public class BloodRegisterService {
 
 // BloodRegisterResponse
         BloodRegisterResponse bloodRegisterResponse = BloodRegisterResponse.builder()
+                .id(bloodRegister.getUser().getId())
                 .emergencyName(bloodRegisterRequest.getEmergencyName())
                 .emergencyPhone(bloodRegisterRequest.getEmergencyPhone())
                 .wantedDate(bloodRegisterRequest.getWantedDate())
@@ -259,6 +260,7 @@ public class BloodRegisterService {
                     return DonationHistoryResponse.builder()
                             .id(bloodRegister.getUser().getId())
                             .fullName(bloodRegister.getUser().getFullName())
+                            .bloodType(bloodRegister.getUser().getBloodType())
                             .completedDate(completedDate)
                             .unit(unit)
                             .build();
@@ -350,6 +352,7 @@ public class BloodRegisterService {
 
                 // 5. Chuyển sang response trả về
                 return BloodRegisterResponse.builder()
+                        .id(bloodRegister.getUser().getId())
                         .emergencyName(bloodRegister.getUser().getEmergencyName())
                         .emergencyPhone(bloodRegister.getUser().getEmergencyPhone())
                         .wantedDate(bloodRegister.getWantedDate())
