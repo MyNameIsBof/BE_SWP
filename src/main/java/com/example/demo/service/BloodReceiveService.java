@@ -367,10 +367,38 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         return bloodReceives.stream()
                 .map(bloodReceive -> ReceiveHistoryResponse.builder()
                         .id(bloodReceive.getId())
+                        .fullName(bloodReceive.getBloodReceive().getUser().getFullName())
                         .receiveDate(bloodReceive.getReceiveDate())
                         .unit(bloodReceive.getUnit())
                         .bloodType(bloodReceive.getBloodType())
                         .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ReceiveHistoryResponse> getReceiveHistoryByUserId(Long id) {
+        User currentUser = authenticationService.getCurrentUser();
+        if (currentUser.getId() != (id)) {
+            throw new GlobalException("Bạn không có quyền truy xuất lịch sử nhận máu của người dùng.");
+        }
+
+        List<BloodReceiveHistory> histories = bloodReceiveHistoryRepository.findByUserId(id);
+
+        if (histories.isEmpty()) {
+            throw new GlobalException("Không có lịch sử nhận máu nào cho người dùng này");
+        }
+
+        return histories.stream()
+                .filter(bloodReceive -> bloodReceive.getBloodReceive().getStatus().equals(BloodReceiveStatus.COMPLETED))
+                .map(history -> {
+                    User user = history.getBloodReceive().getUser();
+                    return ReceiveHistoryResponse.builder()
+                            .id(history.getId())
+                            .fullName(user.getFullName())
+                            .bloodType(user.getBloodType())
+                            .receiveDate(history.getReceiveDate())
+                            .unit(history.getUnit())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

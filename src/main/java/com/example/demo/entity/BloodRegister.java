@@ -41,6 +41,9 @@ public class BloodRegister {
     @OneToOne(mappedBy = "bloodRegister",cascade = CascadeType.ALL)
     BloodDonationHistory bloodDonationHistory;
 
+    @OneToOne(mappedBy = "bloodRegister", cascade = CascadeType.ALL)
+    Certificate certificate;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "health_check_id")
     HealthCheck healthCheck;

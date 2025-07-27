@@ -54,14 +54,10 @@ public class User implements UserDetails {
     List<BloodRegister> registers;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true )
-    List<BloodRegister> recive;
+    List<BloodRegister> receive;
 
     @OneToMany(mappedBy = "recipient", orphanRemoval = true)
     List<Notification> notifications;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "donor", orphanRemoval = true)
-    List<Certificate> certificates;
 
     @JsonIgnore
     @OneToMany(mappedBy = "staff", orphanRemoval = true)
