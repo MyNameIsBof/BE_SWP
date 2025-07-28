@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/blood-register")
+@RequestMapping("/api/certificates")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 @RequiredArgsConstructor
@@ -28,9 +28,15 @@ public class CertificateAPI {
         return ResponseEntity.ok(certificateService.create(request));
     }
 
-   @GetMapping("/certificates/donor/{donorId}")
+   @GetMapping("/donor/{donorId}")
     @Operation(summary = "Lấy tất cả chứng nhận theo ID người hiến máu")
     public ResponseEntity<List<CertificateResponse>> getCertificatesByDonor(@PathVariable Long donorId) {
         return ResponseEntity.ok(certificateService.getCertificatesByDonorId(donorId));
+    }
+
+    @GetMapping("/get-certificate-by-id/{id}")
+    @Operation(summary = "Lấy chứng nhận hiến máu theo ID đơn đăng ký")
+    public ResponseEntity<CertificateResponse> getCertificateById(@PathVariable Long id) {
+        return ResponseEntity.ok(certificateService.getCertificateById(id));
     }
 }

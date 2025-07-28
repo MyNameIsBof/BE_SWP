@@ -260,6 +260,7 @@ public class BloodRegisterService {
                     Optional<BloodDonationHistory> bloodOpt = bloodDonationHistoryRepository.findByBloodRegisterId(bloodRegister.getId());
                     float unit = bloodOpt.map(BloodDonationHistory::getUnit).orElse(0f);
                     LocalDate completedDate = bloodOpt.map(BloodDonationHistory::getDonationDate).orElse(null);
+                    Long certificateId = bloodOpt.map(BloodDonationHistory::getCertificateId).orElse(null);
 
                     return DonationHistoryResponse.builder()
                             .id(bloodRegister.getUser().getId())
@@ -267,6 +268,7 @@ public class BloodRegisterService {
                             .bloodType(bloodRegister.getUser().getBloodType())
                             .completedDate(completedDate)
                             .unit(unit)
+                            .certificateId(certificateId)
                             .build();
                 })
                 .collect(Collectors.toList());
