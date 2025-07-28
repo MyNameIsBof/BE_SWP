@@ -31,14 +31,22 @@ public class BlogAPI {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
 
+    // Lấy tất cả blog theo userId
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Lấy danh sách blog theo ID người dùng")
+    public ResponseEntity<List<BlogResponse>> getBlogsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(blogService.getBlogsByUserId(userId));
+    }
+
     @GetMapping("/admin")
     public ResponseEntity<List<BlogResponse>> getAllBlogsForAdmin() {
         return ResponseEntity.ok(blogService.getAllBlogsForAdmin());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BlogResponse> getBlogById(@PathVariable Long id) {
-        return blogService.getBlogById(id)
+    @GetMapping("/{blogId}")
+    @Operation(summary = "Lấy chi tiết blog theo ID")
+    public ResponseEntity<BlogResponse> getBlogById(@PathVariable Long blogId) {
+        return blogService.getBlogById(blogId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -81,11 +89,10 @@ public class BlogAPI {
         return ResponseEntity.ok(url);
     }
 
-
     @PostMapping("/{blogId}/ratings")
     public BlogRatingResponse rateBlog(@PathVariable Long blogId,
                                        @RequestBody BlogRatingRequest req,
-                                       @RequestParam Long userId) { // hoặc lấy userId từ SecurityContext
+                                       @RequestParam Long userId) {
         return blogService.rateBlog(blogId, userId, req);
     }
 

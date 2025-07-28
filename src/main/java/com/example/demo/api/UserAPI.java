@@ -1,28 +1,26 @@
 package com.example.demo.api;
 
-
-
 import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.*;
 
 import com.example.demo.dto.request.ForgotPasswordRequest;
 import com.example.demo.dto.request.ResetPasswordRequest;
 import com.example.demo.dto.request.UserRequest;
-
-import com.example.demo.entity.User;
-import com.example.demo.enums.UserStatus;
 import com.example.demo.repository.AuthenticationRepository;
 import com.example.demo.service.PasswordResetService;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -88,10 +86,36 @@ public class UserAPI {
     }
 
     @GetMapping("/check-donation-ability")
-    @Operation(summary = "")
+    @Operation(summary = " Kiểm tra khả năng hiến máu")
     public ResponseEntity<CheckDonationAbilityResponse> checkHealth(@RequestParam Long id) {
         return ResponseEntity.ok(updateUserService.checkHealth(id));
     }
 
+//    @PostMapping("/users/{id}/images")
+//    @Operation(summary = "Tải lên hình ảnh người dùng")
+//    public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestPart("file") MultipartFile file) {
+//        String url = updateUserService.saveImage(id, file, "avatar");
+//        return ResponseEntity.ok(Map.of("url", url));
+//    }
 
+    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Tải lên ảnh và trả về URL ảnh cho user")
+    public ResponseEntity<?> uploadUserImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        // Giả sử bạn lưu file vào thư mục uploads/ và trả về URL
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String uploadDir = "uploads/user_images/";
+        try {
+            java.nio.file.Path filePath = java.nio.file.Paths.get(uploadDir + fileName);
+            file.transferTo(filePath);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Upload failed"));
+        }
+
+        // Trả về đường dẫn public URL, ví dụ: http://localhost:8080/uploads/[fileName]
+        String url = "uploads/user_images/" + fileName;
+        return ResponseEntity.ok(Map.of("url", url));
+    }
 }
