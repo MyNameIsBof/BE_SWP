@@ -24,6 +24,9 @@ public class BloodDonationHistory {
 
     float unit;
 
+    @Column(name = "certificate_id")
+    Long certificateId;
+
     @Temporal(TemporalType.DATE)
     LocalDate expirationDate;
     LocalDate donationDate;

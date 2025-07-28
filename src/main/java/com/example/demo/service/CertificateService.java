@@ -2,18 +2,21 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.CertificateRequest;
 import com.example.demo.dto.response.CertificateResponse;
+import com.example.demo.entity.BloodDonationHistory;
 import com.example.demo.entity.BloodRegister;
 import com.example.demo.entity.Certificate;
 import com.example.demo.entity.User;
 import com.example.demo.enums.Role;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.repository.AuthenticationRepository;
+import com.example.demo.repository.BloodDonationHistoryRepository;
 import com.example.demo.repository.BloodRegisterRepository;
 import com.example.demo.repository.CertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CertificateService {
@@ -25,6 +28,9 @@ public class CertificateService {
 
     @Autowired
     CertificateRepository certificateRepository;
+
+    @Autowired
+    BloodDonationHistoryRepository bloodDonationHistoryRepository;
 
     public CertificateResponse create(CertificateRequest request) {
         // Lấy nhân viên hiện tại
@@ -56,6 +62,14 @@ public class CertificateService {
 
         certificate = certificateRepository.save(certificate);
 
+        final Long certificateId = certificate.getId(); // tạo biến final
+
+        Optional<BloodDonationHistory> historyOpt = bloodDonationHistoryRepository.findByBloodRegisterId(bloodRegister.getId());
+        historyOpt.ifPresent(history -> {
+            history.setCertificateId(certificateId); // dùng biến final
+            bloodDonationHistoryRepository.save(history);
+        });
+
         // Trả về response
         return CertificateResponse.builder()
                 .id(certificate.getId())
@@ -77,6 +91,26 @@ public class CertificateService {
                         .issueDate(c.getIssueDate())
                         .build())
                 .toList();
+    }
+
+    public CertificateResponse getCertificateById(Long certificateId) {
+        Certificate certificate = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new GlobalException("Không tìm thấy chứng nhận hiến máu"));
+
+        if (certificate.getBloodRegister() == null || certificate.getBloodRegister().getUser() == null) {
+            throw new GlobalException("Chứng nhận không có thông tin người hiến máu hợp lệ");
+        }
+
+        if (certificate.getStaff() == null) {
+            throw new GlobalException("Chứng nhận không có thông tin nhân viên");
+        }
+
+        return CertificateResponse.builder()
+                .id(certificate.getId())
+                .donorName(certificate.getBloodRegister().getUser().getFullName())
+                .staffName(certificate.getStaff().getFullName())
+                .issueDate(certificate.getIssueDate())
+                .build();
     }
 
 }
