@@ -20,4 +20,5 @@ public class DonationHistoryResponse {
     BloodType bloodType;
     LocalDate completedDate;
     float unit;
+    Long certificateId;
 }
