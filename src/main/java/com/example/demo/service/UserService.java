@@ -7,14 +7,23 @@ import com.example.demo.dto.response.RemindResponse;
 import com.example.demo.dto.response.UpdateUserResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserImage;
 import com.example.demo.enums.Role;
 import com.example.demo.enums.UserStatus;
 import com.example.demo.exception.exceptions.AuthenticationException;
 import com.example.demo.exception.exceptions.GlobalException;
 import com.example.demo.repository.AuthenticationRepository;
+import com.example.demo.repository.UserImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.IIOException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +35,12 @@ public class UserService {
 
     @Autowired
     AuthenticationService authenticationService;
+
+    @Autowired
+    AuthenticationRepository userRepository;
+
+    @Autowired
+    UserImageRepository userImageRepository;
 
     public UpdateUserResponse updateUser(UserRequest userRequest){;
         User currentUser = authenticationService.getCurrentUser();
@@ -43,7 +58,7 @@ public class UserService {
             Optional.ofNullable(userRequest.getEmergencyPhone()).ifPresent(currentUser::setEmergencyPhone);
             Optional.ofNullable(userRequest.getBloodType()).ifPresent(currentUser::setBloodType);
         } else{
-            throw new AuthenticationException("User not found");
+            throw new AuthenticationException("Không tìm thấy người dùng hiện tại");
         }
 
 
@@ -117,7 +132,7 @@ public class UserService {
         throw new GlobalException("Chưa đủ điều kiện hiến máu");
     }
 
-    public void updateUserStatus(UpdateStatusRequest request) {
+    public boolean updateUserStatus(UpdateStatusRequest request) {
         if (request.getStatus() != UserStatus.ACTIVE) {
             User currentUser = authenticationService.getCurrentUser();
             if (currentUser == null || !currentUser.getRole().equals(Role.ADMIN)) {
@@ -128,6 +143,7 @@ public class UserService {
                 .orElseThrow(() -> new GlobalException("Người dùng không tồn tại"));
         userToUpdate.setStatus(request.getStatus());
         authenticationRepository.save(userToUpdate);
+        return true;
     }
 
     public RemindResponse getDonationReminder() {
@@ -148,5 +164,36 @@ public class UserService {
             return new RemindResponse("Bạn cần chờ thêm " + daysRemaining + " ngày nữa để đủ điều kiện hiến máu tiếp theo.");
         }
     }
+
+    public String saveImage(Long userId, MultipartFile file, String type) {
+        try {
+            // Tạo tên file duy nhất
+            String fileName = userId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            // Đường dẫn lưu file (thư mục trên server)
+            Path uploadPath = Paths.get("uploads/user_images");
+            Files.createDirectories(uploadPath);
+            Files.copy(file.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+
+            // Đường dẫn truy cập ảnh qua web
+            String url = "/uploads/user_images/" + fileName;
+
+            // Lấy user từ DB
+            User user = userRepository.findById(userId).orElseThrow();
+
+            // Tạo entity UserImage và lưu vào DB
+            UserImage userImage = UserImage.builder()
+                    .url(url)
+                    .type(type)
+                    .user(user)
+                    .build();
+            userImageRepository.save(userImage);
+
+            return url;
+        } catch (IOException e) {
+            throw new GlobalException("Lỗi lưu ảnh: " + e.getMessage());
+        }
+    }
+
+
 }
 

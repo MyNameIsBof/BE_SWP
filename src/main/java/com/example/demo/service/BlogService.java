@@ -69,15 +69,15 @@ public class BlogService {
     }
 
     //lấy chi tiết blog theo userId nếu còn hoạt động
-    public Optional<BlogResponse> getBlogByUserId(Long userId) {
+    public List<BlogResponse> getBlogsByUserId(Long userId) {
         try {
-            return blogRepository.findByAuthorIgnoreCase(userId.toString())
+            return blogRepository.findByUserId(userId)
                     .stream()
                     .filter(blog -> blog.getStatus() == BlogStatus.ACTIVE)
-                    .findFirst()
-                    .map(this::convertToResponse);
+                    .map(this::convertToResponse)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new GlobalException("Lỗi khi lấy chi tiết blog theo userId: " + e.getMessage());
+            throw new GlobalException("Lỗi khi lấy blog của userId: " + e.getMessage());
         }
     }
 
@@ -93,6 +93,7 @@ public class BlogService {
 
             Blog blog = convertToEntity(request);
             blog.setAuthor(currentUser.getFullName()); // Gán tên người dùng làm tác giả
+            blog.setUserId(currentUser.getId());
             blog.setCreatedAt(LocalDateTime.now());
             blog.setUpdatedAt(LocalDateTime.now());
             blog.setStatus(BlogStatus.ACTIVE);

@@ -27,6 +27,9 @@ public class Blog {
 
     String author;
 
+    @Column(name = "user_id") // <--- Thêm dòng này!
+    Long userId;
+
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 
