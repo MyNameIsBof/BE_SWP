@@ -42,7 +42,7 @@ public class EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 
             // Setting up necessary details
-            mimeMessageHelper.setFrom("admin@gmail.com");
+            mimeMessageHelper.setFrom("Blood Donation Support System <admin@gmail.com>");
             mimeMessageHelper.setTo(to);
             mimeMessageHelper.setText(html, true);
             mimeMessageHelper.setSubject(subject);
@@ -70,7 +70,7 @@ public class EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 
             // Setting up necessary details
-            mimeMessageHelper.setFrom("admin@gmail.com");
+            mimeMessageHelper.setFrom("Blood Donation Support System <admin@gmail.com>");
             mimeMessageHelper.setTo(to);
             mimeMessageHelper.setText(html, true);
             mimeMessageHelper.setSubject(subject);
@@ -99,7 +99,7 @@ public class EmailService {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 
-            mimeMessageHelper.setFrom("admin@gmail.com");
+            mimeMessageHelper.setFrom("Blood Donation Support System <admin@gmail.com>");
             mimeMessageHelper.setTo(to);
             mimeMessageHelper.setText(html, true);
             mimeMessageHelper.setSubject(subject);

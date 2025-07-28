@@ -19,6 +19,7 @@ public class DonationHistoryResponse {
     @Enumerated(EnumType.STRING)
     BloodType bloodType;
     LocalDate completedDate;
+    long bloodRegisterId;
     float unit;
     Long certificateId;
 }

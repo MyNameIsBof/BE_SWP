@@ -247,6 +247,7 @@ public class BloodRegisterService {
                     Long certificateId = bloodOpt.map(BloodDonationHistory::getCertificateId).orElse(null);
 
                     return DonationHistoryResponse.builder()
+                            .bloodRegisterId(bloodRegister.getId())
                             .id(bloodRegister.getUser().getId())
                             .fullName(bloodRegister.getUser().getFullName())
                             .bloodType(bloodRegister.getUser().getBloodType())
@@ -392,6 +393,8 @@ public class BloodRegisterService {
                             .bloodType(user.getBloodType())
                             .lastDonation(user.getLastDonation())
                             .unitDonation(completedCount)
+                            .bloodRegisterId(br.getId())
+                            .hasCertificate(br.getCertificate() != null)
                             .build();
                 })
                 .collect(Collectors.toList());

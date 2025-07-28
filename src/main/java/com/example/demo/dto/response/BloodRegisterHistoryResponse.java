@@ -22,4 +22,6 @@ public class BloodRegisterHistoryResponse {
     BloodType bloodType;
     LocalDate lastDonation;
     Integer unitDonation;
+    long bloodRegisterId;
+    boolean hasCertificate;
 }
