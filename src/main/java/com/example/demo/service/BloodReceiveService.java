@@ -39,41 +39,40 @@ public class BloodReceiveService {
     public List<BloodReceiveListResponse> getAll() {
         List<BloodReceive> bloodReceives = bloodReceiveRepository.findAll();
         User currentUser = authenticationService.getCurrentUser();
-          if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký nhận máu");
         }
         return bloodReceives.stream()
-                .map(bloodReceive -> BloodReceiveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
+                .map(bloodReceive -> BloodReceiveListResponse.builder()
                         .id(bloodReceive.getId())
-                        .fullName(bloodReceive.getUser().getFullName())  // Tên đầy đủ của người dùng
-                        .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
-                        .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
-                        .wantedHour(bloodReceive.getWantedHour())  // Giờ mong muốn
-                        .bloodType(bloodReceive.getUser().getBloodType())  // Loại nhóm máu
-                        .isEmergency(bloodReceive.isEmergency())  // Kiểm tra tình trạng khẩn cấp
+                        .fullName(bloodReceive.getUser().getFullName())
+                        .status(bloodReceive.getStatus())
+                        .wantedDate(bloodReceive.getWantedDate())
+                        .wantedHour(bloodReceive.getWantedHour())
+                        .bloodType(bloodReceive.getUser().getBloodType())
+                        .isEmergency(bloodReceive.isEmergency())
                         .build())
                 .toList();
     }
 
-
-public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> statuses) {
-    List<BloodReceive> bloodReceives = bloodReceiveRepository.findByStatusIn(statuses);
-    User currentUser = authenticationService.getCurrentUser();
-         if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
+    public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> statuses) {
+        List<BloodReceive> bloodReceives = bloodReceiveRepository.findByStatusIn(statuses);
+        User currentUser = authenticationService.getCurrentUser();
+        if(!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn đăng ký nhận máu");
         }
-    return bloodReceives.stream()
-            .map(bloodReceive -> BloodReceiveListResponse.builder()  // Sử dụng lambda để tạo đối tượng
-                    .id(bloodReceive.getId())
-                    .fullName(bloodReceive.getUser().getFullName())
-                    .status(bloodReceive.getStatus())  // Chuyển trạng thái (enum)
-                    .wantedDate(bloodReceive.getWantedDate())  // Ngày mong muốn
-                    .wantedHour(bloodReceive.getWantedHour())  // Giờ mong muốn
-                    .bloodType(bloodReceive.getUser().getBloodType())  // Loại nhóm máu
-                    .isEmergency(bloodReceive.isEmergency())  // Kiểm tra tình trạng khẩn cấp
-                    .build())
-            .toList();
-}
+        return bloodReceives.stream()
+                .map(bloodReceive -> BloodReceiveListResponse.builder()
+                        .id(bloodReceive.getId())
+                        .fullName(bloodReceive.getUser().getFullName())
+                        .status(bloodReceive.getStatus())
+                        .wantedDate(bloodReceive.getWantedDate())
+                        .wantedHour(bloodReceive.getWantedHour())
+                        .bloodType(bloodReceive.getUser().getBloodType())
+                        .isEmergency(bloodReceive.isEmergency())
+                        .build())
+                .toList();
+    }
 
     @Transactional
     public BloodReceiveResponse create(BloodReceiveRequest request) {
@@ -89,10 +88,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         currentUser.setEmergencyName(request.getEmergencyName());
         currentUser.setEmergencyPhone(request.getEmergencyPhone());
 
-
         // Create blood receive record
         BloodReceive bloodReceive = bloodReceiveMapper.toBloodReceive(request);
-        bloodReceive.setStatus(BloodReceiveStatus.PENDING); // Using BloodRegisterStatus from entity
+        bloodReceive.setStatus(BloodReceiveStatus.PENDING);
         bloodReceive.setUser(currentUser);
         bloodReceive.setEmergency(request.isEmergency());
         bloodReceive.setWantedDate(request.getWantedDate());
@@ -100,9 +98,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
         bloodReceiveRepository.save(bloodReceive);
 
         // Create notification for blood request
-        String notificationMessage = "Blood type: " + currentUser.getBloodType() + 
-                                   ", Date: " + request.getWantedDate() + 
-                                   ", Time: " + request.getWantedHour();
+        String notificationMessage = "Nhóm máu: " + currentUser.getBloodType() +
+                ", Ngày: " + request.getWantedDate() +
+                ", Giờ: " + request.getWantedHour();
         if (request.isEmergency()) {
             notificationService.createEmergencyRequestNotification(currentUser, notificationMessage);
         } else {
@@ -157,9 +155,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.APPROVED);
                 notificationService.createSystemAnnouncementNotification(
-                    bloodReceive.getUser(),
-                    "Blood Request Approved",
-                    "Your blood request has been approved and is being processed."
+                        bloodReceive.getUser(),
+                        "Đơn yêu cầu nhận máu đã được duyệt",
+                        "Đơn yêu cầu nhận máu của bạn đã được duyệt và đang được xử lý."
                 );
                 break;
             case REJECTED:
@@ -168,9 +166,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.REJECTED);
                 notificationService.createSystemAnnouncementNotification(
-                    bloodReceive.getUser(),
-                    "Blood Request Rejected",
-                    "Your blood request has been rejected. Please contact support for more information."
+                        bloodReceive.getUser(),
+                        "Đơn yêu cầu nhận máu bị từ chối",
+                        "Đơn yêu cầu nhận máu của bạn đã bị từ chối. Vui lòng liên hệ hỗ trợ để biết thêm thông tin."
                 );
                 break;
             case COMPLETED:
@@ -179,8 +177,8 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.COMPLETED);
                 notificationService.createDonationCompletedNotification(
-                    bloodReceive.getUser(),
-                    "Blood transfusion completed successfully."
+                        bloodReceive.getUser(),
+                        "Truyền máu thành công."
                 );
                 break;
             case INCOMPLETED:
@@ -189,9 +187,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.INCOMPLETED);
                 notificationService.createSystemAnnouncementNotification(
-                    bloodReceive.getUser(),
-                    "Blood Request Incomplete",
-                    "Your blood request could not be completed. Please contact the medical staff."
+                        bloodReceive.getUser(),
+                        "Đơn yêu cầu nhận máu chưa hoàn thành",
+                        "Đơn yêu cầu nhận máu của bạn chưa được hoàn thành. Vui lòng liên hệ nhân viên y tế."
                 );
                 break;
             case CANCELED:
@@ -201,9 +199,9 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 }
                 bloodReceive.setStatus(BloodReceiveStatus.CANCELED);
                 notificationService.createSystemAnnouncementNotification(
-                    bloodReceive.getUser(),
-                    "Blood Request Cancelled",
-                    "Your blood request has been cancelled."
+                        bloodReceive.getUser(),
+                        "Đơn yêu cầu nhận máu đã bị hủy",
+                        "Đơn yêu cầu nhận máu của bạn đã bị hủy."
                 );
                 break;
             default:
@@ -245,8 +243,6 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 .build();
     }
 
-
-
     @Transactional
     public BloodReceiveResponse setCompleted(BloodSetCompletedRequest request) {
         User currentUser = authenticationService.getCurrentUser();
@@ -254,32 +250,26 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
             throw new GlobalException("Bạn không có quyền lấy máu cho người nhận");
         }
 
-        // Lấy đơn yêu cầu nhận máu trước
         BloodReceive receive = bloodReceiveRepository.findById(request.getBloodId())
                 .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
-        // Kiểm tra trạng thái đơn để tránh xử lý lại nhiều lần
         if (receive.getStatus() == BloodReceiveStatus.COMPLETED) {
             throw new GlobalException("Đơn nhận máu này đã hoàn thành.");
         }
 
-        // Lấy nhóm máu của người nhận
         BloodType neededType = receive.getUser().getBloodType();
         float requiredUnits = request.getUnit();
 
         BloodReceive bloodReceive = bloodReceiveRepository.findById(request.getBloodId())
                 .orElseThrow(() -> new GlobalException("Đơn yêu cầu nhận máu không tồn tại"));
 
-        // Lấy danh sách nhóm máu tương thích với người nhận
         List<BloodType> compatibleTypes = BloodType.CompatibleBloodMap.get(neededType);
         if (compatibleTypes == null || compatibleTypes.isEmpty()) {
             throw new GlobalException("Không có nhóm máu phù hợp để truyền cho " + neededType);
         }
 
-        // Lấy danh sách kho máu theo nhóm tương thích, còn máu (>0 đơn vị)
         List<BloodInventory> inventories = bloodInventoryRepository
                 .findByBloodTypeInAndUnitsAvailableGreaterThan(compatibleTypes, 0f);
 
-        // Ưu tiên loại máu gần với nhóm máu người nhận nhất
         inventories.sort(Comparator.comparingInt(
                 inv -> compatibleTypes.indexOf(inv.getBloodType())
         ));
@@ -304,14 +294,12 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
 
         bloodInventoryRepository.saveAll(usedInventories);
 
-        // Đánh dấu đơn yêu cầu nhận máu là hoàn tất
         receive.setStatus(BloodReceiveStatus.COMPLETED);
         bloodReceiveRepository.save(receive);
 
-        // Create notification for completed blood receive
-        String completionMessage = "Blood transfusion completed successfully. " +
-                "Blood type: " + receive.getUser().getBloodType() +
-                ", Units received: " + requiredUnits;
+        String completionMessage = "Truyền máu thành công. " +
+                "Nhóm máu: " + receive.getUser().getBloodType() +
+                ", Số lượng nhận: " + requiredUnits;
         notificationService.createDonationCompletedNotification(receive.getUser(), completionMessage);
 
         BloodReceiveHistory bloodReceiveHistory = BloodReceiveHistory.builder()
@@ -353,7 +341,6 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
     public List<ReceiveHistoryResponse> getListReceiveHistory() {
         User currentUser = authenticationService.getCurrentUser();
 
-        // Kiểm tra quyền truy cập
         if (!Role.STAFF.equals(currentUser.getRole()) && !Role.ADMIN.equals(currentUser.getRole())) {
             throw new GlobalException("Bạn không có quyền truy xuất danh sách đơn nhận máu");
         }
@@ -409,7 +396,7 @@ public List<BloodReceiveListResponse> getByStatuses(List<BloodReceiveStatus> sta
                 .filter(bloodReceive -> bloodReceive.getUser() != null)
                 .filter(bloodReceive -> BloodReceiveStatus.APPROVED.equals(bloodReceive.getStatus()))
                 .map(bloodReceive -> bloodReceive.getUser().getBloodType())
-                .distinct() // ← Loại bỏ trùng lặp
+                .distinct()
                 .map(bloodType -> EmergencyBloodTypeResponse.builder()
                         .bloodType(bloodType)
                         .build())
