@@ -22,5 +22,7 @@ public class BloodRegisterListResponse {
     BloodType bloodType;
     float unit;
     boolean healthCheckStatus;
+    String emergencyName;
+    String emergencyPhone;
 
 }
