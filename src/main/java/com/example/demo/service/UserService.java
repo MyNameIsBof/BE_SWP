@@ -60,8 +60,6 @@ public class UserService {
         } else{
             throw new AuthenticationException("Không tìm thấy người dùng hiện tại");
         }
-
-
             authenticationRepository.save(currentUser);
             UpdateUserResponse userResponse = UpdateUserResponse.builder()
                     .id(currentUser.getId())
