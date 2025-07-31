@@ -85,6 +85,7 @@ public class UserAPI {
         return ResponseEntity.ok(updateUserService.getDonationReminder());
     }
 
+
     @GetMapping("/check-donation-ability")
     @Operation(summary = " Kiểm tra khả năng hiến máu")
     public ResponseEntity<CheckDonationAbilityResponse> checkHealth(@RequestParam Long id) {

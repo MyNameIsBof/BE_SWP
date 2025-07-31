@@ -16,7 +16,6 @@ import com.example.demo.repository.BloodReceiveHistoryRepository;
 import com.example.demo.repository.BloodReceiveRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
