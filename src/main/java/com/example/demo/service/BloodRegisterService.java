@@ -164,7 +164,7 @@ public class BloodRegisterService {
                 .orElseThrow(() -> new GlobalException("Đơn đăng ký không tồn tại"));
         switch (status) {
             case APPROVED -> {
-                if (authenticationService.getCurrentUser().getRole() != Role.ADMIN) {
+                if (authenticationService.getCurrentUser().getRole() != Role.ADMIN|| authenticationService.getCurrentUser().getRole() != Role.STAFF) {
                     throw new GlobalException("Bạn không có quyền duyệt đơn đăng ký");
                 }
                 if(bloodRegister.getStatus().equals(BloodRegisterStatus.PENDING)){
