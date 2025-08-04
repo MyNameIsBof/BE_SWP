@@ -47,8 +47,6 @@ public class HealthCheckService {
         BloodRegister bloodRegister = bloodRegisterRepository.findById(healthCheckRequest.getBloodRegisterId())
                 .orElseThrow(() -> new GlobalException("Đơn đăng ký hiến máu không tồn tại"));
 
-        validateHealthCheckInput(healthCheckRequest, bloodRegister.getUser());
-
         // 3. Lấy user từ đơn đăng ký
         User user = bloodRegister.getUser();
 
@@ -139,8 +137,6 @@ public class HealthCheckService {
         BloodRegister bloodRegister = bloodRegisterRepository.findById(healthCheckRequest.getBloodRegisterId())
                 .orElseThrow(() -> new GlobalException("Đơn đăng ký hiến máu không tồn tại"));
 
-        validateHealthCheckInput(healthCheckRequest, bloodRegister.getUser());
-
         // Kiểm tra nếu status là false thì phải có lý do
         if (!healthCheckRequest.isStatus() &&
                 (healthCheckRequest.getReason() == null || healthCheckRequest.getReason().trim().isEmpty())) {
@@ -205,51 +201,5 @@ public class HealthCheckService {
                         .build())
                 .collect(Collectors.toList());
     }
-
-    private void validateHealthCheckInput(HealthCheckRequest request, User user) {
-        int age = Period.between(user.getBirthdate(), LocalDate.now()).getYears();
-        if (age < 18 || age > 60) {
-            throw new GlobalException("Người hiến máu phải từ 18 đến 60 tuổi.");
-        }
-
-        if (user.getGender().equals(Gender.MALE) && request.getWeight() < 45) {
-            throw new GlobalException("Nam phải ≥ 45kg để hiến máu.");
-        }
-
-        if (user.getGender().equals(Gender.FEMALE) && request.getWeight() < 42) {
-            throw new GlobalException("Nữ phải ≥ 42kg để hiến máu.");
-        }
-
-        if (request.getTemperature() < 35 || request.getTemperature() > 38) {
-            throw new GlobalException("Nhiệt độ cơ thể không hợp lệ.");
-        }
-
-        if (!isBloodPressureNormal(request.getBloodPressure())) {
-            throw new GlobalException("Huyết áp không nằm trong giới hạn cho phép.");
-        }
-
-        if (user.getMedicalHistory() != null && containsProhibitedDisease(user.getMedicalHistory())) {
-            throw new GlobalException("Tiền sử bệnh không đủ điều kiện hiến máu.");
-        }
-    }
-
-    private boolean isBloodPressureNormal(Double bloodPressure) {
-        if (bloodPressure == null) {
-            return false;
-        }
-
-        return bloodPressure >= 50 && bloodPressure <= 250;
-    }
-
-    private boolean containsProhibitedDisease(String history) {
-        String[] prohibited = {"viêm gan", "HIV", "AIDS", "ung thư", "tim mạch"};
-        for (String disease : prohibited) {
-            if (history.toLowerCase().contains(disease)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
 }

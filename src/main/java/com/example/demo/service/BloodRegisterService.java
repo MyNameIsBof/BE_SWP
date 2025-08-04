@@ -195,6 +195,22 @@ public class BloodRegisterService {
                     throw new GlobalException("Đơn đăng ký không ở trạng thái chờ duyệt");
                 }
             }
+            case INCOMPLETED -> {
+                if (authenticationService.getCurrentUser().getRole() != Role.STAFF) {
+                    throw new GlobalException("Bạn không có quyền duyệt đơn đăng ký");
+                }
+                if(bloodRegister.getStatus().equals(BloodRegisterStatus.APPROVED)){
+                    bloodRegister.setStatus(BloodRegisterStatus.INCOMPLETED);
+                    bloodRegisterRepository.save(bloodRegister);
+                    notificationService.createSystemAnnouncementNotification(
+                            bloodRegister.getUser(),
+                            "Đơn đăng ký hiến máu không đủ điều kiện",
+                            "Đơn đăng ký hiến máu của bạn không đủ điều kiện để hoàn thành. Vui lòng kiểm tra lại thông tin sức khỏe."
+                    );
+                }else{
+                    throw new GlobalException("Đơn đăng ký không ở trạng thái đã duyệt");
+                }
+            }
             case CANCELED -> {
                 User currentUser = authenticationService.getCurrentUser();
                 if (!bloodRegister.getUser().getEmail().equals(currentUser.getEmail()) && currentUser.getRole() != Role.MEMBER) {
@@ -212,7 +228,11 @@ public class BloodRegisterService {
                     throw new GlobalException("Đơn đăng ký không ở trạng thái chờ duyệt");
                 }
             }
-            default -> throw new GlobalException("Trạng thái không hợp lệ");
+
+            default -> {
+                System.out.println(status);
+                throw new GlobalException("Trạng thái không hợp lệ");
+            }
         }
     }
 
@@ -284,6 +304,8 @@ public class BloodRegisterService {
                             .status(bloodRegister.getStatus())
                             .bloodType(bloodRegister.getUser().getBloodType())
                             .unit(unit)
+                            .emergencyName(bloodRegister.getUser().getEmergencyName())
+                            .emergencyPhone(bloodRegister.getUser().getEmergencyPhone())
                             .build();
                 })
                 .collect(Collectors.toList());
