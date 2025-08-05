@@ -331,8 +331,15 @@ public class BloodRegisterService {
 
                 User user = bloodRegister.getUser();
                 user.setLastDonation(bloodSetCompletedRequest.getImplementationDate());
-                authenticationRepository.save(user);
+                String completionDetails = "Số đơn vị máu: " + bloodSetCompletedRequest.getUnit() +
+                        ", Ngày hiến: " + bloodSetCompletedRequest.getImplementationDate() +
+                        ", Nhóm máu: " + bloodRegister.getUser().getBloodType();
 
+                notificationService.createDonationCompletedNotification(
+                        bloodRegister.getUser(),
+                        completionDetails
+                );
+                authenticationRepository.save(user);
                 return BloodRegisterResponse.builder()
                         .id(bloodRegister.getUser().getId())
                         .emergencyName(bloodRegister.getUser().getEmergencyName())
